@@ -11,17 +11,36 @@
         <Grid.Resources>
             <local:SetByButtonSelectionConverter x:Key="SetByNewButtonSelectionConverter" />
             <local:SetByButtonSelectionConverter x:Key="SetByExistingButtonSelectionConverter" IsInverted="True" />
+            <Thickness x:Key="SubsectionMargin">30,5,0,0</Thickness>
+            <Thickness x:Key="SectionMargin">0,0,0,20</Thickness>
+            
+            <Style 
+                x:Key="TitleTextBlock"
+                TargetType="TextBlock">
+                <Setter Property="FontSize" Value="24"/>
+                <Setter Property="Margin" Value="{StaticResource SectionMargin}"/>
+            </Style>
         </Grid.Resources>
-        
+
+        <Image Source="Assets/pregnantbelly.png" />
+
         <Grid MaxWidth="500"
               Margin="20">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
+            
+            <TextBlock 
+                Style="{StaticResource TitleTextBlock}"
+                Text="Set your profile" 
+                />
 
-            <StackPanel Grid.Row="0">
-                <local:ExpandingControl x:Name="NewUserSection">
+            <StackPanel Grid.Row="1">
+                <local:ExpandingControl 
+                    x:Name="NewUserSection"
+                    Margin="{StaticResource SectionMargin}">
                     <local:ExpandingControl.Header>
                         <RadioButton 
                             Content="Create a new profile"
@@ -30,13 +49,17 @@
                             IsChecked="{Binding CurrentState.Value, Converter={StaticResource SetByNewButtonSelectionConverter}}"/>
                     </local:ExpandingControl.Header>
                     <local:ExpandingControl.Body>
-                        <StackPanel>
-                            <TextBox PlaceholderText="enter profile name" />
-                        </StackPanel>
+                        <Grid Margin="{StaticResource SubsectionMargin}">
+                            <TextBox 
+                                PlaceholderText="enter profile name"
+                                MinWidth="300"/>
+                        </Grid>
                     </local:ExpandingControl.Body>
                 </local:ExpandingControl>
-                
-                <local:ExpandingControl x:Name="ExistingUserSection">
+
+                <local:ExpandingControl 
+                    x:Name="ExistingUserSection"
+                    Margin="{StaticResource SectionMargin}">
                     <local:ExpandingControl.Header>
                         <RadioButton 
                             Content="I already have a profile"
@@ -45,7 +68,7 @@
                             IsChecked="{Binding CurrentState.Value, Converter={StaticResource SetByExistingButtonSelectionConverter}}"/>
                     </local:ExpandingControl.Header>
                     <local:ExpandingControl.Body>
-                        <StackPanel>
+                        <StackPanel Margin="{StaticResource SubsectionMargin}">
                             <TextBlock Text="Existing user name"/>
                             <TextBlock Text="Existing user name"/>
                             <TextBlock Text="Existing user name"/>
@@ -74,10 +97,11 @@
                 </local:ExpandingControl>
             </StackPanel>
 
-            <Grid Grid.Row="1">
+            <Grid Grid.Row="2">
                 <Button 
                     Content="Next"
-                    HorizontalAlignment="Right"/>
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding SubmitCommand}"/>
             </Grid>
         </Grid>
     </Grid>

@@ -27,11 +27,14 @@ namespace BabyBrother.ViewModels
 
         public ICommand SetByExistingCommand { get; private set; }
 
+        public ICommand SubmitCommand { get; private set; }
+
         public SetUserPageViewModel()
         {
             _subscriptions = new CompositeDisposable();
             var setUserByNew = new ReactiveCommand();
             var setUserByExisting = new ReactiveCommand();
+            var submitCommand = new ReactiveCommand();
 
             SetByNewCommand = setUserByNew;
             SetByExistingCommand = setUserByExisting;
@@ -44,6 +47,10 @@ namespace BabyBrother.ViewModels
                 .ToReactiveProperty(State.SetByNew);
 
             _subscriptions.Add(CurrentState);
+
+            submitCommand.Subscribe(_ =>
+            {
+            });
         }
 
         public void Dispose()
