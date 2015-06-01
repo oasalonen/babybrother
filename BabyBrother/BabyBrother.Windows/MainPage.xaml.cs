@@ -35,8 +35,8 @@ namespace BabyBrother
             _subscriptions = new CompositeDisposable();
             _subscriptions.Add(_viewModel.CurrentState.Subscribe((state) =>
             {
-                System.Diagnostics.Debug.WriteLine("Going to state " + state.ToString());
-                VisualStateManager.GoToState(this, state.ToString(), true);
+                NewUserSection.CurrentState = (state == SetUserPageViewModel.State.SetByNew ? ExpandingControl.State.Expanded : ExpandingControl.State.Collapsed);
+                ExistingUserSection.CurrentState = (state == SetUserPageViewModel.State.SetByExisting ? ExpandingControl.State.Expanded : ExpandingControl.State.Collapsed);
             }));
             _subscriptions.Add(_viewModel);
         }
@@ -47,4 +47,22 @@ namespace BabyBrother
             base.OnNavigatedFrom(e);
         }
     }
+
+    public class SetByButtonSelectionConverter : IValueConverter
+    {
+        public bool IsInverted { get; set; }
+
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            var state = (SetUserPageViewModel.State) value;
+            return IsInverted ? state != SetUserPageViewModel.State.SetByNew : state == SetUserPageViewModel.State.SetByNew;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            var isSelected = (bool)value;
+            return IsInverted ? SetUserPageViewModel.State.SetByExisting : SetUserPageViewModel.State.SetByNew;
+        }
+    }
+
 }

@@ -8,6 +8,11 @@
     mc:Ignorable="d">
 
     <Grid x:Name="RootGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.Resources>
+            <local:SetByButtonSelectionConverter x:Key="SetByNewButtonSelectionConverter" />
+            <local:SetByButtonSelectionConverter x:Key="SetByExistingButtonSelectionConverter" IsInverted="True" />
+        </Grid.Resources>
+        
         <Grid MaxWidth="500"
               Margin="20">
             <Grid.RowDefinitions>
@@ -16,96 +21,65 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0">
-                <RadioButton Content="Create a new profile"
-                    GroupName="SetMethodGroup"
-                    Command="{Binding SetByNewCommand}"/>
-                <Rectangle x:Name="ClosedNewUserSection" Width="0" Height="0" Fill="Blue" />
-                <StackPanel x:Name="NewUserSection">
-                    <StackPanel x:Name="NewContent">
-                        <TextBox PlaceholderText="enter profile name" />
-                    </StackPanel>
-                </StackPanel>
+                <local:ExpandingControl x:Name="NewUserSection">
+                    <local:ExpandingControl.Header>
+                        <RadioButton 
+                            Content="Create a new profile"
+                            GroupName="SetMethodGroup"
+                            Command="{Binding SetByNewCommand}"
+                            IsChecked="{Binding CurrentState.Value, Converter={StaticResource SetByNewButtonSelectionConverter}}"/>
+                    </local:ExpandingControl.Header>
+                    <local:ExpandingControl.Body>
+                        <StackPanel>
+                            <TextBox PlaceholderText="enter profile name" />
+                        </StackPanel>
+                    </local:ExpandingControl.Body>
+                </local:ExpandingControl>
                 
-                <RadioButton Content="I already have a profile"
-                    GroupName="SetMethodGroup"
-                    Command="{Binding SetByExistingCommand}"/>
-                <Rectangle x:Name="ClosedExistingUserSection" Width="0" Height="0" Fill="Blue" />
-                <StackPanel x:Name="ExistingUserSection">
-                    <StackPanel x:Name="ExistingContent">
-                        <TextBlock Text="Existing user name"/>
-                        <TextBlock Text="Existing user name"/>
-                        <TextBlock Text="Existing user name"/>
-                    </StackPanel>
-                </StackPanel>
+                <local:ExpandingControl x:Name="ExistingUserSection">
+                    <local:ExpandingControl.Header>
+                        <RadioButton 
+                            Content="I already have a profile"
+                            GroupName="SetMethodGroup"
+                            Command="{Binding SetByExistingCommand}"
+                            IsChecked="{Binding CurrentState.Value, Converter={StaticResource SetByExistingButtonSelectionConverter}}"/>
+                    </local:ExpandingControl.Header>
+                    <local:ExpandingControl.Body>
+                        <StackPanel>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                            <TextBlock Text="Existing user name"/>
+                        </StackPanel>
+                    </local:ExpandingControl.Body>
+                </local:ExpandingControl>
             </StackPanel>
 
             <Grid Grid.Row="1">
-                <Button Content="Next"
+                <Button 
+                    Content="Next"
                     HorizontalAlignment="Right"/>
             </Grid>
         </Grid>
-
-        <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup>
-                <VisualState x:Name="SetByNew">
-                    <Storyboard>
-                        <!--<FadeInThemeAnimation TargetName="NewUserSection" Duration="0:0:0.5" />
-                        <FadeOutThemeAnimation TargetName="ExistingUserSection" Duration="0:0:0.5" />-->
-                        <SplitCloseThemeAnimation
-                            OpenedTargetName="ExistingUserSection" 
-                            ContentTargetName="ExistingContent" 
-                            ClosedTargetName="ClosedExistingUserSection"
-                            ContentTranslationDirection="Top"
-                            ContentTranslationOffset="-200"  
-                            OffsetFromCenter="0"
-                            OpenedLength="200"
-                            ClosedLength="0"
-                        />
-                        <SplitOpenThemeAnimation 
-                            OpenedTargetName="NewUserSection" 
-                            ContentTargetName="NewContent" 
-                            ClosedTargetName="ClosedNewUserSection"
-                            ContentTranslationDirection="Top"
-                            ContentTranslationOffset="200"  
-                            OffsetFromCenter="0"
-                            OpenedLength="200"
-                            ClosedLength="0"
-                        />
-                    </Storyboard>
-                </VisualState>
-                <VisualState x:Name="SetByExisting">
-                    <Storyboard>
-                        <!--<FadeInThemeAnimation TargetName="ExistingUserSection" Duration="0:0:0.5" />
-                        <FadeOutThemeAnimation TargetName="NewUserSection" Duration="0:0:0.5" />-->
-                        <!--<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ExistingUserSection"
-                                                   Storyboard.TargetProperty="Visibility"
-                                                   Duration="0">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
-                        </ObjectAnimationUsingKeyFrames>-->
-                        <SplitOpenThemeAnimation 
-                            OpenedTargetName="ExistingUserSection" 
-                            ContentTargetName="ExistingContent" 
-                            ClosedTargetName="ClosedExistingUserSection"
-                            ContentTranslationDirection="Top"
-                            ContentTranslationOffset="200"  
-                            OffsetFromCenter="0"
-                            OpenedLength="200"
-                            ClosedLength="0"
-                        />
-                        <SplitCloseThemeAnimation
-                            OpenedTargetName="NewUserSection" 
-                            ContentTargetName="NewContent" 
-                            ClosedTargetName="ClosedNewUserSection"
-                            ContentTranslationDirection="Top"
-                            ContentTranslationOffset="-200"  
-                            OffsetFromCenter="0"
-                            OpenedLength="200"
-                            ClosedLength="0"
-                        />
-                    </Storyboard>
-                </VisualState>
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
     </Grid>
    
 </Page>
