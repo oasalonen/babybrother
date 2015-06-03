@@ -1,4 +1,5 @@
-﻿using BabyBrother.ViewModels;
+﻿using BabyBrother.Models;
+using BabyBrother.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -46,6 +47,11 @@ namespace BabyBrother
             _subscriptions.Dispose();
             base.OnNavigatedFrom(e);
         }
+
+        private void OnExistingUserSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _viewModel.SelectExistingUser(e.AddedItems.FirstOrDefault() as User);
+        }
     }
 
     public class SetByButtonSelectionConverter : IValueConverter
@@ -62,6 +68,33 @@ namespace BabyBrother
         {
             var isSelected = (bool)value;
             return IsInverted ? SetUserPageViewModel.State.SetByExisting : SetUserPageViewModel.State.SetByNew;
+        }
+    }
+
+    public class VisibilityConverter : IValueConverter
+    {
+        public bool IsInverted { get; set; }
+
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            Boolean booleanValue = 
+                (value is Boolean ? 
+                (Boolean) value :      // type is bool, use it
+                (value != null));   // type is something else, use null check
+            
+            if (IsInverted)
+            {
+                return booleanValue ? Visibility.Collapsed : Visibility.Visible;
+            }
+            else
+            {
+                return booleanValue ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
         }
     }
 

@@ -9,6 +9,8 @@
 
     <Grid x:Name="RootGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.Resources>
+            <local:VisibilityConverter x:Key="VisibilityConverter" />
+            <local:VisibilityConverter x:Key="InvertedVisibilityConverter" IsInverted="True" />
             <local:SetByButtonSelectionConverter x:Key="SetByNewButtonSelectionConverter" />
             <local:SetByButtonSelectionConverter x:Key="SetByExistingButtonSelectionConverter" IsInverted="True" />
             <Thickness x:Key="SubsectionMargin">30,5,0,0</Thickness>
@@ -46,13 +48,16 @@
                             Content="Create a new profile"
                             GroupName="SetMethodGroup"
                             Command="{Binding SetByNewCommand}"
-                            IsChecked="{Binding CurrentState.Value, Converter={StaticResource SetByNewButtonSelectionConverter}}"/>
+                            IsChecked="{Binding CurrentState.Value, Converter={StaticResource SetByNewButtonSelectionConverter}}"
+                            />
                     </local:ExpandingControl.Header>
                     <local:ExpandingControl.Body>
                         <Grid Margin="{StaticResource SubsectionMargin}">
                             <TextBox 
                                 PlaceholderText="enter profile name"
-                                MinWidth="300"/>
+                                MinWidth="300"
+                                Text="{Binding NewUsername.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                />
                         </Grid>
                     </local:ExpandingControl.Body>
                 </local:ExpandingControl>
@@ -65,33 +70,30 @@
                             Content="I already have a profile"
                             GroupName="SetMethodGroup"
                             Command="{Binding SetByExistingCommand}"
-                            IsChecked="{Binding CurrentState.Value, Converter={StaticResource SetByExistingButtonSelectionConverter}}"/>
+                            IsChecked="{Binding CurrentState.Value, Converter={StaticResource SetByExistingButtonSelectionConverter}}"
+                            />
                     </local:ExpandingControl.Header>
                     <local:ExpandingControl.Body>
                         <StackPanel Margin="{StaticResource SubsectionMargin}">
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
-                            <TextBlock Text="Existing user name"/>
+                            <TextBlock 
+                                Text="No existing profiles" 
+                                Visibility="{Binding IsExistingUsersAvailable.Value, Converter={StaticResource InvertedVisibilityConverter}}"
+                                />
+                            <ListView 
+                                ItemsSource="{Binding ExistingUsers}"
+                                SelectionMode="Single"
+                                Visibility="{Binding IsExistingUsersAvailable.Value, Converter={StaticResource VisibilityConverter}}"
+                                SelectionChanged="OnExistingUserSelectionChanged">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock 
+                                            Text="{Binding Name}"
+                                            Margin="5"
+                                            Width="300"
+                                            />
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
                         </StackPanel>
                     </local:ExpandingControl.Body>
                 </local:ExpandingControl>

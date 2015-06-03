@@ -8,6 +8,11 @@ EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BabyBrother.Shared", "BabyBrother\BabyBrother.Shared\BabyBrother.Shared.shproj", "{B6114B7D-880E-42FB-8A24-45AC9854489C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BabyBrother.Windows", "BabyBrother\BabyBrother.Windows\BabyBrother.Windows.csproj", "{1D06510E-781E-4FDA-82C4-D7FE1A1C1DCD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7420BD77-5A58-42FA-9080-E726F418DA2A} = {7420BD77-5A58-42FA-9080-E726F418DA2A}
+		{02DDCCA2-3A2E-4602-B359-CB732C859E2F} = {02DDCCA2-3A2E-4602-B359-CB732C859E2F}
+		{8D2ECEAF-6E23-42E6-9CD8-DB8FF6192064} = {8D2ECEAF-6E23-42E6-9CD8-DB8FF6192064}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BabyBrother.WindowsPhone", "BabyBrother\BabyBrother.WindowsPhone\BabyBrother.WindowsPhone.csproj", "{07CC7EA1-E17D-4127-8AF3-85347BF2A151}"
 EndProject
@@ -16,6 +21,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BabyBrother.ViewModels", "BabyBrother.ViewModels\BabyBrother.ViewModels.csproj", "{02DDCCA2-3A2E-4602-B359-CB732C859E2F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BabyBrother.Base", "BabyBrother.Base\BabyBrother.Base.csproj", "{7420BD77-5A58-42FA-9080-E726F418DA2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BabyBrother.Services", "BabyBrother.Services\BabyBrother.Services.csproj", "{21E17EAE-1DDC-416D-91BA-0524AA05306B}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -108,6 +115,16 @@ Global
 		{7420BD77-5A58-42FA-9080-E726F418DA2A}.Release|ARM.ActiveCfg = Release|Any CPU
 		{7420BD77-5A58-42FA-9080-E726F418DA2A}.Release|x64.ActiveCfg = Release|Any CPU
 		{7420BD77-5A58-42FA-9080-E726F418DA2A}.Release|x86.ActiveCfg = Release|Any CPU
+		{21E17EAE-1DDC-416D-91BA-0524AA05306B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21E17EAE-1DDC-416D-91BA-0524AA05306B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21E17EAE-1DDC-416D-91BA-0524AA05306B}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{21E17EAE-1DDC-416D-91BA-0524AA05306B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{21E17EAE-1DDC-416D-91BA-0524AA05306B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{21E17EAE-1DDC-416D-91BA-0524AA05306B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21E17EAE-1DDC-416D-91BA-0524AA05306B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21E17EAE-1DDC-416D-91BA-0524AA05306B}.Release|ARM.ActiveCfg = Release|Any CPU
+		{21E17EAE-1DDC-416D-91BA-0524AA05306B}.Release|x64.ActiveCfg = Release|Any CPU
+		{21E17EAE-1DDC-416D-91BA-0524AA05306B}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -119,5 +136,6 @@ Global
 		{8D2ECEAF-6E23-42E6-9CD8-DB8FF6192064} = {0A92F55E-BD16-4C40-BFC8-971A0DF65CFC}
 		{02DDCCA2-3A2E-4602-B359-CB732C859E2F} = {0A92F55E-BD16-4C40-BFC8-971A0DF65CFC}
 		{7420BD77-5A58-42FA-9080-E726F418DA2A} = {0A92F55E-BD16-4C40-BFC8-971A0DF65CFC}
+		{21E17EAE-1DDC-416D-91BA-0524AA05306B} = {0A92F55E-BD16-4C40-BFC8-971A0DF65CFC}
 	EndGlobalSection
 EndGlobal
