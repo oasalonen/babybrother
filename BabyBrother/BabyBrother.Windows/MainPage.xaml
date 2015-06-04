@@ -24,7 +24,7 @@
             </Style>
         </Grid.Resources>
 
-        <Image Source="Assets/pregnantbelly.png" />
+        <!--<Image Source="Assets/pregnantbelly.png" />-->
 
         <Grid MaxWidth="500"
               Margin="20">

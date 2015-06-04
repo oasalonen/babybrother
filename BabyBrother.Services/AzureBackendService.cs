@@ -7,6 +7,8 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reactive.Threading.Tasks;
+using System.Reactive;
 
 namespace BabyBrother.Services
 {
@@ -23,10 +25,9 @@ namespace BabyBrother.Services
             _userTable = _service.GetTable<User>();
         }
 
-        public async Task AddUser(User user)
+        public IObservable<Unit> AddUser(User user)
         {
-            //return Observable.StartAsync(() => _userTable.InsertAsync(user));
-            await _userTable.InsertAsync(user);
+            return _userTable.InsertAsync(user).ToObservable();
         }
 
         public IObservable<IEnumerable<User>> GetUsers()

@@ -5,6 +5,7 @@ using Reactive.Bindings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -18,8 +19,7 @@ namespace BabyBrother.ViewModels
     {
         private readonly CompositeDisposable _subscriptions;
         private readonly ISubject<User> _userSelectionStream;
-        private readonly IObservable<bool> _canSubmitStream;
-        private readonly ISubject<bool> _isAddUserInProgressStream;
+        private readonly ISubject<IObservable<Notification<Unit>>> _addUserStream;
         private readonly AzureBackendService _backendService;
 
         public enum State
@@ -48,7 +48,7 @@ namespace BabyBrother.ViewModels
             _backendService = new AzureBackendService();
             _subscriptions = new CompositeDisposable();
             _userSelectionStream = new BehaviorSubject<User>(null);
-            _isAddUserInProgressStream = new BehaviorSubject<bool>(false);
+            _addUserStream = new BehaviorSubject<IObservable<Notification<Unit>>>(Observable.Empty<Unit>().Materialize());
             var setUserByNew = new ReactiveCommand();
             var setUserByExisting = new ReactiveCommand();
 
@@ -76,11 +76,14 @@ namespace BabyBrother.ViewModels
 
             var isExistingUserSelectedStream = _userSelectionStream.Select(user => user != null);
             var isNewUsernameSetStream = NewUsername.Select(name => !string.IsNullOrWhiteSpace(name));
-            _canSubmitStream = isExistingUserSelectedStream
+            var isAddUserInProgressStream = _addUserStream
+                .Switch()
+                .Select(notification => notification.Kind == NotificationKind.OnNext);
+            var canSubmitStream = isExistingUserSelectedStream
                 .CombineLatest(isNewUsernameSetStream, (isNameSet, isUserSelected) => isNameSet || isUserSelected)
-                .CombineLatest(_isAddUserInProgressStream, (isUserInfoSet, isAddUserInProgress) => isUserInfoSet && !isAddUserInProgress);
+                .CombineLatest(isAddUserInProgressStream, (isUserInfoSet, isAddUserInProgress) => isUserInfoSet && !isAddUserInProgress);
 
-            var submitCommand = new ReactiveCommand(_canSubmitStream);
+            var submitCommand = new ReactiveCommand(canSubmitStream);
             _subscriptions.Add(submitCommand.Subscribe(_ =>
             {
                 OnSubmit();
@@ -98,22 +101,13 @@ namespace BabyBrother.ViewModels
             _userSelectionStream.OnNext(user);
         }
 
-        private async void OnSubmit()
+        private void OnSubmit()
         {
-            _isAddUserInProgressStream.OnNext(true);
-            try
+            var user = new User
             {
-                await Task.Delay(2000);
-                var user = new User
-                {
-                    Name = NewUsername.Value
-                };
-                await _backendService.AddUser(user);
-            }
-            finally
-            {
-                _isAddUserInProgressStream.OnNext(false);
-            }
+                Name = NewUsername.Value
+            };
+            _addUserStream.OnNext(_backendService.AddUser(user).Materialize());
         }
     }
 }
