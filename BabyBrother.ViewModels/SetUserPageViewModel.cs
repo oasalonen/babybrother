@@ -74,8 +74,12 @@ namespace BabyBrother.ViewModels
             IsExistingUsersAvailable = userStream.Any().ToReactiveProperty();
             _subscriptions.Add(IsExistingUsersAvailable);
 
-            var isExistingUserSelectedStream = _userSelectionStream.Select(user => user != null);
-            var isNewUsernameSetStream = NewUsername.Select(name => !string.IsNullOrWhiteSpace(name));
+            var isExistingUserSelectedStream = _userSelectionStream
+                .Select(user => user != null)
+                .CombineLatest(CurrentState, (isUserSelected, state) => isUserSelected && state == State.SetByExisting);
+            var isNewUsernameSetStream = NewUsername
+                .Select(name => !string.IsNullOrWhiteSpace(name))
+                .CombineLatest(CurrentState, (isNameSet, state) => isNameSet && state == State.SetByNew);
             var isAddUserInProgressStream = _addUserStream
                 .Switch()
                 .Select(notification => notification.Kind == NotificationKind.OnNext);
