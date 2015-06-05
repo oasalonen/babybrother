@@ -20,7 +20,7 @@ namespace BabyBrother.ViewModels
         private readonly CompositeDisposable _subscriptions;
         private readonly ISubject<User> _userSelectionStream;
         private readonly ISubject<IObservable<Notification<Unit>>> _addUserStream;
-        private readonly AzureBackendService _backendService;
+        private readonly IBackendService _backendService;
 
         public enum State
         {
@@ -43,9 +43,9 @@ namespace BabyBrother.ViewModels
 
         public ICommand SubmitCommand { get; private set; }
 
-        public SetUserPageViewModel()
+        public SetUserPageViewModel(IBackendService backendService)
         {
-            _backendService = new AzureBackendService();
+            _backendService = backendService;
             _subscriptions = new CompositeDisposable();
             _userSelectionStream = new BehaviorSubject<User>(null);
             _addUserStream = new BehaviorSubject<IObservable<Notification<Unit>>>(Observable.Empty<Unit>().Materialize());
@@ -59,15 +59,13 @@ namespace BabyBrother.ViewModels
             var setByExistingStream = setUserByExisting.Select(_ => State.SetByExisting);
 
             CurrentState = setByNewStream.Merge(setByExistingStream)
-                .Do(state => System.Diagnostics.Debug.WriteLine("STATE " + state.ToString()))
                 .ToReactiveProperty(State.SetByNew);
             _subscriptions.Add(CurrentState);
 
             NewUsername = new ReactiveProperty<string>();
             _subscriptions.Add(NewUsername);
 
-            var userStream = _backendService.GetUsers()
-                .SelectMany(users => users);
+            var userStream = _backendService.GetUsers();
             ExistingUsers = userStream.ToReactiveCollection();
             _subscriptions.Add(ExistingUsers);
 

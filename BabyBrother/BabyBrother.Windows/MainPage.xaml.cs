@@ -1,4 +1,5 @@
 ﻿using BabyBrother.Models;
+using BabyBrother.Services.Implementations;
 using BabyBrother.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace BabyBrother
 
         public MainPage()
         {
-            DataContext = _viewModel = new SetUserPageViewModel();
+            DataContext = _viewModel = new SetUserPageViewModel(new AzureBackendService());
             this.InitializeComponent();
 
             _subscriptions = new CompositeDisposable();

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Reactive.Threading.Tasks;
 using System.Reactive;
 
-namespace BabyBrother.Services
+namespace BabyBrother.Services.Implementations
 {
     public class AzureBackendService : IBackendService
     {
@@ -30,9 +30,10 @@ namespace BabyBrother.Services
             return _userTable.InsertAsync(user).ToObservable();
         }
 
-        public IObservable<IEnumerable<User>> GetUsers()
+        public IObservable<User> GetUsers()
         {
-            return Observable.StartAsync(() => _userTable.ToListAsync());
+            return Observable.StartAsync(() => _userTable.ToListAsync())
+                .SelectMany(users => users);
         }
     }
 }

@@ -38,7 +38,7 @@
     <TargetPlatform Include="Windows, Version=8.1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AzureBackendService.cs" />
+    <Compile Include="Implementations\AzureBackendService.cs" />
     <Compile Include="IBackendService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
