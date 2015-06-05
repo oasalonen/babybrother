@@ -105,11 +105,15 @@ namespace BabyBrother.ViewModels
 
         private void OnSubmit()
         {
-            var user = new User
+            var newName = NewUsername.Value;
+            if (!string.IsNullOrWhiteSpace(newName) && CurrentState.Value == State.SetByNew)
             {
-                Name = NewUsername.Value
-            };
-            _addUserStream.OnNext(_backendService.AddUser(user).Materialize());
+                var user = new User
+                {
+                    Name = newName
+                };
+                _addUserStream.OnNext(_backendService.AddUser(user).Materialize());
+            }
         }
     }
 }

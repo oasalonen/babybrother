@@ -9,6 +9,7 @@ using Telerik.JustMock;
 using System.Threading;
 using BabyBrother.Models;
 using System.Reactive.Linq;
+using System.Reactive;
 
 namespace BabyBrother.UnitTest
 {
@@ -68,7 +69,92 @@ namespace BabyBrother.UnitTest
         }
 
         [TestMethod]
+        public void TestSubmitCommandAddsUserWhenSetByNewAndNameIsSet()
+        {
+            var expectedName = "name";
+            User calledUser = null;
+
+            Mock.Arrange(() => _backendService.AddUser(Arg.IsAny<User>()))
+                .DoInstead<User>(u => calledUser = u)
+                .Returns(Observable.Empty<Unit>())
+                .OccursOnce();
+
+            _viewModel.NewUsername.Value = expectedName;
+            _viewModel.SubmitCommand.Execute(null);
+
+            Assert.AreEqual(expectedName, calledUser.Name);
+            Mock.Assert(_backendService);
+        }
+
+        [DataTestMethod]
+        [DataRow(null, DisplayName = "Null username")]
+        [DataRow("", DisplayName = "Empty username")]
+        [DataRow(" ", DisplayName = "Whitespace username")]
+        public void TestSubmitCommandDoesNothingWhenSetByNewAndInvalidName(string name)
+        {
+            Mock.Arrange(() => _backendService.AddUser(Arg.IsAny<User>()))
+                .Returns(Observable.Empty<Unit>())
+                .OccursNever();
+
+            _viewModel.NewUsername.Value = name;
+            _viewModel.SubmitCommand.Execute(null);
+
+            Mock.Assert(_backendService);
+        }
+
+        [TestMethod]
+        public void TestSubmitCommandDoesNothingWhenSetByExisting()
+        {
+            Mock.Arrange(() => _backendService.AddUser(Arg.IsAny<User>()))
+                .Returns(Observable.Empty<Unit>())
+                .OccursNever();
+
+            _viewModel.NewUsername.Value = "name";
+            _viewModel.SetByExistingCommand.Execute(null);
+            _viewModel.SubmitCommand.Execute(null);
+
+            Mock.Assert(_backendService);
+        }
+
+        [DataTestMethod]
+        [DataRow("", SetUserPageViewModel.State.SetByNew, false, false, DisplayName = "Set by new with no name cannot exec")]
+        [DataRow("a", SetUserPageViewModel.State.SetByNew, false, true, DisplayName = "Set by new with name can exec")]
+        [DataRow("", SetUserPageViewModel.State.SetByExisting, false, false, DisplayName = "Set by existing with no selection cannot exec")]
+        [DataRow("", SetUserPageViewModel.State.SetByExisting, true, true, DisplayName = "Set by existing with selection can exec")]
+        public void TestSubmitCommandCanExecuteIsSetCorrectly(string name, SetUserPageViewModel.State state, bool isUserSelected, bool expectedCanExecute)
+        {
+            _viewModel.NewUsername.Value = name;
+            _viewModel.CurrentState.Value = state;
+            _viewModel.SelectExistingUser(isUserSelected ? new User { Name = name } : null);
+            Assert.AreEqual(expectedCanExecute, _viewModel.SubmitCommand.CanExecute(null));
+        }
+
+        [TestMethod]
         public void TestGetsExistingUsersWhenConstructed()
+        {
+            var backendService = Mock.Create<IBackendService>();
+            var users = new List<User>
+            {
+                new User { Name = "a" },
+                new User { Name = "b" }
+            };
+            Mock.Arrange(() => backendService.GetUsers())
+                .Returns(() => users.ToObservable())
+                .OccursOnce();
+
+            var viewModel = new SetUserPageViewModel(backendService);
+            CollectionAssert.AreEquivalent(users, viewModel.ExistingUsers);
+            Mock.Assert(backendService);
+        }
+
+        [TestMethod]
+        public void TestIsExistingUsersAvailableIsFalseWhenBackendReturnsNone()
+        {
+            Assert.IsFalse(_viewModel.IsExistingUsersAvailable.Value);
+        }
+
+        [TestMethod]
+        public void TestIsExistingUsersAvailableIsTrueWhenBackendReturnsSome()
         {
             var backendService = Mock.Create<IBackendService>();
             var users = new List<User>
@@ -81,7 +167,8 @@ namespace BabyBrother.UnitTest
                 .MustBeCalled();
 
             var viewModel = new SetUserPageViewModel(backendService);
-            CollectionAssert.AreEquivalent(users, viewModel.ExistingUsers);
+            Assert.IsTrue(viewModel.IsExistingUsersAvailable.Value);
+            Mock.Assert(backendService);
         }
     }
 }
