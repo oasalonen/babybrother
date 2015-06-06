@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.ApplicationModel.Resources;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -31,7 +32,8 @@ namespace BabyBrother
 
         public MainPage()
         {
-            DataContext = _viewModel = new SetUserPageViewModel(new AzureBackendService(), new WindowsNotificationService());
+            var stringResourceLoader = ResourceLoader.GetForViewIndependentUse("Strings");
+            DataContext = _viewModel = new SetUserPageViewModel(new AzureBackendService(), new WindowsNotificationService(), new WindowsResourceService(stringResourceLoader));
             this.InitializeComponent();
 
             _subscriptions = new CompositeDisposable();

@@ -1,19 +1,13 @@
-﻿using BabyBrother.Base;
-using BabyBrother.Models;
+﻿using BabyBrother.Models;
 using BabyBrother.Services;
 using Reactive.Bindings;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using Windows.UI.Popups;
 
 namespace BabyBrother.ViewModels
 {
@@ -24,6 +18,7 @@ namespace BabyBrother.ViewModels
         private readonly ISubject<IObservable<Notification<Unit>>> _addUserStream;
         private readonly IBackendService _backendService;
         private readonly INotificationService _notificationService;
+        private readonly IResourceService _resourceService;
 
         public enum State
         {
@@ -46,10 +41,12 @@ namespace BabyBrother.ViewModels
 
         public ICommand SubmitCommand { get; private set; }
 
-        public SetUserPageViewModel(IBackendService backendService, INotificationService notificationService)
+        public SetUserPageViewModel(IBackendService backendService, INotificationService notificationService, IResourceService resourceService)
         {
             _backendService = backendService;
             _notificationService = notificationService;
+            _resourceService = resourceService;
+
             _subscriptions = new CompositeDisposable();
             _userSelectionStream = new BehaviorSubject<User>(null);
             _addUserStream = new BehaviorSubject<IObservable<Notification<Unit>>>(Observable.Empty<Unit>().Materialize());
@@ -102,8 +99,8 @@ namespace BabyBrother.ViewModels
                 .Subscribe(async (_) =>
                 {
                     await _notificationService.ShowBlockingMessageAsync(
-                        "We were unable to create your profile at this time. Make sure you are connected to the internet. Otherwise, try again later.",
-                        "Could not create your profile");
+                        _resourceService.GetString("SetUserCreateProfileErrorMessage"),
+                        _resourceService.GetString("SetUserCreateProfileErrorTitle"));
                 }));
         }
 

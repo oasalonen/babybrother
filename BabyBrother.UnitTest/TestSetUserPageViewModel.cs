@@ -19,6 +19,7 @@ namespace BabyBrother.UnitTest
         private SetUserPageViewModel _viewModel;
         private IBackendService _backendService;
         private INotificationService _notificationService;
+        private IResourceService _resourceService;
 
         [TestInitialize]
         public void Initialize()
@@ -27,7 +28,9 @@ namespace BabyBrother.UnitTest
             SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
 
             _backendService = Mock.Create<IBackendService>();
-            _viewModel = new SetUserPageViewModel(_backendService, _notificationService);
+            _notificationService = Mock.Create<INotificationService>();
+            _resourceService = Mock.Create<IResourceService>();
+            _viewModel = new SetUserPageViewModel(_backendService, _notificationService, _resourceService);
         }
 
         [TestCleanup]
@@ -143,7 +146,7 @@ namespace BabyBrother.UnitTest
                 .Returns(() => users.ToObservable())
                 .OccursOnce();
 
-            var viewModel = new SetUserPageViewModel(backendService, _notificationService);
+            var viewModel = new SetUserPageViewModel(backendService, _notificationService, _resourceService);
             CollectionAssert.AreEquivalent(users, viewModel.ExistingUsers);
             Mock.Assert(backendService);
         }
@@ -167,7 +170,7 @@ namespace BabyBrother.UnitTest
                 .Returns(() => users.ToObservable())
                 .MustBeCalled();
 
-            var viewModel = new SetUserPageViewModel(backendService, _notificationService);
+            var viewModel = new SetUserPageViewModel(backendService, _notificationService, _resourceService);
             Assert.IsTrue(viewModel.IsExistingUsersAvailable.Value);
             Mock.Assert(backendService);
         }
@@ -179,7 +182,7 @@ namespace BabyBrother.UnitTest
             Mock.Arrange(() => backendService.GetUsers())
                 .Returns(() => Observable.Throw<User>(new Exception()));
 
-            var viewModel = new SetUserPageViewModel(backendService, _notificationService);
+            var viewModel = new SetUserPageViewModel(backendService, _notificationService, _resourceService);
             Assert.IsFalse(viewModel.IsExistingUsersAvailable.Value);
             Assert.AreEqual(0, viewModel.ExistingUsers.Count);
         }

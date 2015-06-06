@@ -41,7 +41,9 @@
     <Compile Include="Implementations\AzureBackendService.cs" />
     <Compile Include="IBackendService.cs" />
     <Compile Include="Implementations\WindowsNotificationService.cs" />
+    <Compile Include="Implementations\WindowsResourceService.cs" />
     <Compile Include="INotificationService.cs" />
+    <Compile Include="IResourceService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

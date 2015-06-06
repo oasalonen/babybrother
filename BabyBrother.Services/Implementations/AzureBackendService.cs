@@ -27,20 +27,13 @@ namespace BabyBrother.Services.Implementations
 
         public IObservable<Unit> AddUser(User user)
         {
-            //return _userTable.InsertAsync(user).ToObservable();
-            return Observable.StartAsync(foo);
+            return _userTable.InsertAsync(user).ToObservable();
         }
 
         public IObservable<User> GetUsers()
         {
             return Observable.StartAsync(() => _userTable.ToListAsync())
                 .SelectMany(users => users);
-        }
-
-        public Task<Unit> foo()
-        {
-            throw new Exception();
-            return Task.FromResult(Unit.Default);
         }
     }
 }
