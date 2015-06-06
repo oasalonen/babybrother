@@ -170,5 +170,17 @@ namespace BabyBrother.UnitTest
             Assert.IsTrue(viewModel.IsExistingUsersAvailable.Value);
             Mock.Assert(backendService);
         }
+
+        [TestMethod]
+        public void TestGetExistingUsersExceptionResultsInEmptyUserList()
+        {
+            var backendService = Mock.Create<IBackendService>();
+            Mock.Arrange(() => backendService.GetUsers())
+                .Returns(() => Observable.Throw<User>(new Exception()));
+
+            var viewModel = new SetUserPageViewModel(backendService);
+            Assert.IsFalse(viewModel.IsExistingUsersAvailable.Value);
+            Assert.AreEqual(0, viewModel.ExistingUsers.Count);
+        }
     }
 }

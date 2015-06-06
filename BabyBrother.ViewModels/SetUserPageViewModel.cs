@@ -66,10 +66,11 @@ namespace BabyBrother.ViewModels
             _subscriptions.Add(NewUsername);
 
             var userStream = _backendService.GetUsers();
-            ExistingUsers = userStream.ToReactiveCollection();
+            var safeUserStream = userStream.Catch(Observable.Empty<User>());
+            ExistingUsers = safeUserStream.ToReactiveCollection();
             _subscriptions.Add(ExistingUsers);
 
-            IsExistingUsersAvailable = userStream.Any().ToReactiveProperty();
+            IsExistingUsersAvailable = safeUserStream.Any().ToReactiveProperty();
             _subscriptions.Add(IsExistingUsersAvailable);
 
             var isExistingUserSelectedStream = _userSelectionStream
