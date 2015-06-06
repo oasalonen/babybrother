@@ -10,8 +10,10 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Windows.UI.Popups;
 
 namespace BabyBrother.ViewModels
 {
@@ -21,6 +23,7 @@ namespace BabyBrother.ViewModels
         private readonly ISubject<User> _userSelectionStream;
         private readonly ISubject<IObservable<Notification<Unit>>> _addUserStream;
         private readonly IBackendService _backendService;
+        private readonly INotificationService _notificationService;
 
         public enum State
         {
@@ -43,9 +46,10 @@ namespace BabyBrother.ViewModels
 
         public ICommand SubmitCommand { get; private set; }
 
-        public SetUserPageViewModel(IBackendService backendService)
+        public SetUserPageViewModel(IBackendService backendService, INotificationService notificationService)
         {
             _backendService = backendService;
+            _notificationService = notificationService;
             _subscriptions = new CompositeDisposable();
             _userSelectionStream = new BehaviorSubject<User>(null);
             _addUserStream = new BehaviorSubject<IObservable<Notification<Unit>>>(Observable.Empty<Unit>().Materialize());
@@ -79,9 +83,8 @@ namespace BabyBrother.ViewModels
             var isNewUsernameSetStream = NewUsername
                 .Select(name => !string.IsNullOrWhiteSpace(name))
                 .CombineLatest(CurrentState, (isNameSet, state) => isNameSet && state == State.SetByNew);
-            var isAddUserInProgressStream = _addUserStream
-                .Switch()
-                .Select(notification => notification.Kind == NotificationKind.OnNext);
+            var latestAddUserStream = _addUserStream.Switch();
+            var isAddUserInProgressStream = latestAddUserStream.Select(notification => notification.Kind == NotificationKind.OnNext);
             var canSubmitStream = isExistingUserSelectedStream
                 .CombineLatest(isNewUsernameSetStream, (isNameSet, isUserSelected) => isNameSet || isUserSelected)
                 .CombineLatest(isAddUserInProgressStream, (isUserInfoSet, isAddUserInProgress) => isUserInfoSet && !isAddUserInProgress);
@@ -92,6 +95,16 @@ namespace BabyBrother.ViewModels
                 OnSubmit();
             }));
             SubmitCommand = submitCommand;
+
+            _subscriptions.Add(latestAddUserStream
+                .Where(notification => notification.Kind == NotificationKind.OnError)
+                .ObserveOn(SynchronizationContext.Current)
+                .Subscribe(async (_) =>
+                {
+                    await _notificationService.ShowBlockingMessageAsync(
+                        "We were unable to create your profile at this time. Make sure you are connected to the internet. Otherwise, try again later.",
+                        "Could not create your profile");
+                }));
         }
 
         public void Dispose()
@@ -113,7 +126,10 @@ namespace BabyBrother.ViewModels
                 {
                     Name = newName
                 };
-                _addUserStream.OnNext(_backendService.AddUser(user).Materialize());
+                _addUserStream.OnNext(_backendService
+                    .AddUser(user)
+                    .Materialize()
+                    .Catch(Observable.Empty<Notification<Unit>>()));
             }
         }
     }

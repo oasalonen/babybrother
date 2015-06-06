@@ -18,6 +18,7 @@ namespace BabyBrother.UnitTest
     {
         private SetUserPageViewModel _viewModel;
         private IBackendService _backendService;
+        private INotificationService _notificationService;
 
         [TestInitialize]
         public void Initialize()
@@ -26,7 +27,7 @@ namespace BabyBrother.UnitTest
             SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
 
             _backendService = Mock.Create<IBackendService>();
-            _viewModel = new SetUserPageViewModel(_backendService);
+            _viewModel = new SetUserPageViewModel(_backendService, _notificationService);
         }
 
         [TestCleanup]
@@ -142,7 +143,7 @@ namespace BabyBrother.UnitTest
                 .Returns(() => users.ToObservable())
                 .OccursOnce();
 
-            var viewModel = new SetUserPageViewModel(backendService);
+            var viewModel = new SetUserPageViewModel(backendService, _notificationService);
             CollectionAssert.AreEquivalent(users, viewModel.ExistingUsers);
             Mock.Assert(backendService);
         }
@@ -166,7 +167,7 @@ namespace BabyBrother.UnitTest
                 .Returns(() => users.ToObservable())
                 .MustBeCalled();
 
-            var viewModel = new SetUserPageViewModel(backendService);
+            var viewModel = new SetUserPageViewModel(backendService, _notificationService);
             Assert.IsTrue(viewModel.IsExistingUsersAvailable.Value);
             Mock.Assert(backendService);
         }
@@ -178,7 +179,7 @@ namespace BabyBrother.UnitTest
             Mock.Arrange(() => backendService.GetUsers())
                 .Returns(() => Observable.Throw<User>(new Exception()));
 
-            var viewModel = new SetUserPageViewModel(backendService);
+            var viewModel = new SetUserPageViewModel(backendService, _notificationService);
             Assert.IsFalse(viewModel.IsExistingUsersAvailable.Value);
             Assert.AreEqual(0, viewModel.ExistingUsers.Count);
         }

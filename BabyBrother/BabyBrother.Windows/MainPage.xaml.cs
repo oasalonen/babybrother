@@ -31,7 +31,7 @@ namespace BabyBrother
 
         public MainPage()
         {
-            DataContext = _viewModel = new SetUserPageViewModel(new AzureBackendService());
+            DataContext = _viewModel = new SetUserPageViewModel(new AzureBackendService(), new WindowsNotificationService());
             this.InitializeComponent();
 
             _subscriptions = new CompositeDisposable();
