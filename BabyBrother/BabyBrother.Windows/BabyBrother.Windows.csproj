@@ -104,6 +104,9 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Pages\SetInfantPage.xaml.cs">
+      <DependentUpon>SetInfantPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\SetUserPage.xaml.cs">
       <DependentUpon>SetUserPage.xaml</DependentUpon>
     </Compile>
@@ -124,6 +127,10 @@
     <Content Include="Assets\StoreLogo.scale-100.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Pages\SetInfantPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\SetUserPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

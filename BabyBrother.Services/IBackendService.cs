@@ -12,5 +12,7 @@ namespace BabyBrother.Services
         IObservable<Unit> AddUser(User user);
 
         IObservable<User> GetUsers();
+
+        IObservable<Infant> GetInfants();
     }
 }

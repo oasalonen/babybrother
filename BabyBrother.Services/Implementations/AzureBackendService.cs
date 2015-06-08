@@ -16,6 +16,7 @@ namespace BabyBrother.Services.Implementations
     {
         private readonly MobileServiceClient _service;
         private readonly IMobileServiceTable<User> _userTable;
+        private readonly IMobileServiceTable<Infant> _infantTable;
 
         public AzureBackendService()
         {
@@ -23,6 +24,7 @@ namespace BabyBrother.Services.Implementations
                 "https://babymon.azure-mobile.net/",
                 "NhogBGTlaNlPcmfrqFLMqrVBGBhswR26");
             _userTable = _service.GetTable<User>();
+            _infantTable = _service.GetTable<Infant>();
         }
 
         public IObservable<Unit> AddUser(User user)
@@ -34,6 +36,12 @@ namespace BabyBrother.Services.Implementations
         {
             return Observable.StartAsync(() => _userTable.ToListAsync())
                 .SelectMany(users => users);
+        }
+
+        public IObservable<Infant> GetInfants()
+        {
+            return Observable.StartAsync(() => _infantTable.ToListAsync())
+                .SelectMany(infants => infants);
         }
     }
 }

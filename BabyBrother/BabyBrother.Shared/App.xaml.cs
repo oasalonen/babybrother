@@ -160,7 +160,7 @@ namespace BabyBrother
 
             Container.RegisterSingle<IBackendService, AzureBackendService>();
             Container.RegisterSingle<INotificationService, WindowsNotificationService>();
-            Container.RegisterSingle<IResourceService>(new WindowsResourceService(ResourceLoader.GetForViewIndependentUse("Strings")));
+            Container.RegisterSingle<IResourceService>(new WindowsResourceService(ResourceLoader.GetForViewIndependentUse("Resources")));
         }
     }
 }

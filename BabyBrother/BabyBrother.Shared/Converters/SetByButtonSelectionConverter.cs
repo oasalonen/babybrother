@@ -12,14 +12,14 @@ namespace BabyBrother.Converters
 
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            var state = (SetUserPageViewModel.State)value;
-            return IsInverted ? state != SetUserPageViewModel.State.SetByNew : state == SetUserPageViewModel.State.SetByNew;
+            var state = (SetByState)value;
+            return IsInverted ? state != SetByState.New : state == SetByState.New;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             var isSelected = (bool)value;
-            return IsInverted ? SetUserPageViewModel.State.SetByExisting : SetUserPageViewModel.State.SetByNew;
+            return IsInverted ? SetByState.Existing : SetByState.New;
         }
     }
 }

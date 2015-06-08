@@ -117,10 +117,58 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="NextButton.Content" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="SetInfantPageCreateInfantSection.Content" xml:space="preserve">
+    <value>Create a new baby profile</value>
+  </data>
+  <data name="SetInfantPageErrorFetchingInfants.Text" xml:space="preserve">
+    <value>Could not fetch existing profiles. Please make sure you are connected to the internet or try again later.</value>
+  </data>
+  <data name="SetInfantPageExistingInfantSection.Content" xml:space="preserve">
+    <value>My baby already has a profile</value>
+  </data>
+  <data name="SetInfantPageInfantNameField.Header" xml:space="preserve">
+    <value>profile name</value>
+  </data>
+  <data name="SetInfantPageInfantNameText.PlaceholderText" xml:space="preserve">
+    <value>enter your baby's name</value>
+  </data>
+  <data name="SetInfantPageNoExistingInfants.Text" xml:space="preserve">
+    <value>No existing profiles</value>
+  </data>
+  <data name="SetInfantPageTitle.Text" xml:space="preserve">
+    <value>Set a baby to track</value>
+  </data>
   <data name="SetUserCreateProfileErrorMessage" xml:space="preserve">
     <value>We were unable to create your profile at this time. Make sure you are connected to the internet. Otherwise, try again later.</value>
   </data>
   <data name="SetUserCreateProfileErrorTitle" xml:space="preserve">
     <value>Could not create your profile</value>
+  </data>
+  <data name="SetUserPageCreateUserSection.Content" xml:space="preserve">
+    <value>Create a new profile</value>
+  </data>
+  <data name="SetUserPageErrorFetchingUsers.Text" xml:space="preserve">
+    <value>Could not fetch existing profiles. Please make sure you are connected to the internet or try again later.</value>
+  </data>
+  <data name="SetUserPageExistingUserSection.Content" xml:space="preserve">
+    <value>I already have a profile</value>
+  </data>
+  <data name="SetUserPageLoadingUsers.Text" xml:space="preserve">
+    <value>Loading existing profiles...</value>
+  </data>
+  <data name="SetUserPageNoExistingUsers.Text" xml:space="preserve">
+    <value>No existing profiles</value>
+  </data>
+  <data name="SetUserPageTitle.Text" xml:space="preserve">
+    <value>Set your profile</value>
+  </data>
+  <data name="SetUserPageUserNameField.Header" xml:space="preserve">
+    <value>profile name</value>
+  </data>
+  <data name="SetUserPageUserNameText.PlaceholderText" xml:space="preserve">
+    <value>enter a profile name</value>
   </data>
 </root>

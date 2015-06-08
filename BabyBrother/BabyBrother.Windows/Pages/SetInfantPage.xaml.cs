@@ -1,5 +1,4 @@
 ﻿using BabyBrother.Models;
-using BabyBrother.Services.Implementations;
 using BabyBrother.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -7,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.ApplicationModel.Resources;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -25,21 +23,21 @@ namespace BabyBrother.Pages
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class SetUserPage : Page
+    public sealed partial class SetInfantPage : Page
     {
-        private SetUserPageViewModel _viewModel;
+        private SetInfantPageViewModel _viewModel;
         private CompositeDisposable _subscriptions;
 
-        public SetUserPage()
+        public SetInfantPage()
         {
-            DataContext = _viewModel = App.Container.GetInstance<SetUserPageViewModel>();
+            DataContext = _viewModel = App.Container.GetInstance<SetInfantPageViewModel>();
             this.InitializeComponent();
 
             _subscriptions = new CompositeDisposable();
             _subscriptions.Add(_viewModel.CurrentState.Subscribe((state) =>
             {
-                NewUserSection.CurrentState = (state == SetByState.New ? ExpandingControl.State.Expanded : ExpandingControl.State.Collapsed);
-                ExistingUserSection.CurrentState = (state == SetByState.Existing ? ExpandingControl.State.Expanded : ExpandingControl.State.Collapsed);
+                NewInfantSection.CurrentState = (state == SetByState.New ? ExpandingControl.State.Expanded : ExpandingControl.State.Collapsed);
+                ExistingInfantSection.CurrentState = (state == SetByState.Existing ? ExpandingControl.State.Expanded : ExpandingControl.State.Collapsed);
             }));
             _subscriptions.Add(_viewModel);
         }
@@ -50,9 +48,9 @@ namespace BabyBrother.Pages
             base.OnNavigatedFrom(e);
         }
 
-        private void OnExistingUserSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OnExistingInfantSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _viewModel.SelectExistingItem(e.AddedItems.FirstOrDefault() as User);
+            _viewModel.SelectExistingItem(e.AddedItems.FirstOrDefault() as Infant);
         }
     }
 }

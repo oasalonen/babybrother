@@ -12,35 +12,15 @@ using System.Windows.Input;
 
 namespace BabyBrother.ViewModels
 {
-    public class SetUserPageViewModel : IDisposable
+    public class SetUserPageViewModel : SetItemViewModel<User>
     {
-        private readonly CompositeDisposable _subscriptions;
         private readonly ISubject<User> _userSelectionStream;
         private readonly ISubject<IObservable<Notification<Unit>>> _addUserStream;
         private readonly IBackendService _backendService;
         private readonly INotificationService _notificationService;
         private readonly IResourceService _resourceService;
 
-        public enum State
-        {
-            SetByNew,
-            SetByExisting
-        }
-
-        public ReactiveProperty<State> CurrentState { get; private set; }
-
         public ReactiveProperty<string> NewUsername { get; private set; }
-
-        public ReactiveProperty<bool> IsExistingUsersAvailable { get; private set; }
-
-        public ReactiveProperty<LoadState> ExistingUsersLoadState { get; private set; }
-
-        // TODO: make readonly
-        public ReactiveCollection<User> ExistingUsers { get; private set; }
-        
-        public ICommand SetByNewCommand { get; private set; }
-
-        public ICommand SetByExistingCommand { get; private set; }
 
         public ICommand SubmitCommand { get; private set; }
 
@@ -50,39 +30,18 @@ namespace BabyBrother.ViewModels
             _notificationService = notificationService;
             _resourceService = resourceService;
 
-            _subscriptions = new CompositeDisposable();
             _userSelectionStream = new BehaviorSubject<User>(null);
             _addUserStream = new BehaviorSubject<IObservable<Notification<Unit>>>(Observable.Empty<Unit>().Materialize());
-            var setUserByNew = new ReactiveCommand();
-            var setUserByExisting = new ReactiveCommand();
-
-            SetByNewCommand = setUserByNew;
-            SetByExistingCommand = setUserByExisting;
-
-            var setByNewStream = setUserByNew.Select(_ => State.SetByNew);
-            var setByExistingStream = setUserByExisting.Select(_ => State.SetByExisting);
-
-            CurrentState = setByNewStream.Merge(setByExistingStream)
-                .ToReactiveProperty(State.SetByNew);
-            _subscriptions.Add(CurrentState);
 
             NewUsername = new ReactiveProperty<string>();
-            _subscriptions.Add(NewUsername);
-
-            var userStream = _backendService.GetUsers();
-            var safeUserStream = userStream.Catch(Observable.Empty<User>());
-            ExistingUsers = safeUserStream.ToReactiveCollection();
-            _subscriptions.Add(ExistingUsers);
-
-            IsExistingUsersAvailable = safeUserStream.Any().ToReactiveProperty();
-            _subscriptions.Add(IsExistingUsersAvailable);
+            AddSubscription(NewUsername);
 
             var isExistingUserSelectedStream = _userSelectionStream
                 .Select(user => user != null)
-                .CombineLatest(CurrentState, (isUserSelected, state) => isUserSelected && state == State.SetByExisting);
+                .CombineLatest(CurrentState, (isUserSelected, state) => isUserSelected && state == SetByState.Existing);
             var isNewUsernameSetStream = NewUsername
                 .Select(name => !string.IsNullOrWhiteSpace(name))
-                .CombineLatest(CurrentState, (isNameSet, state) => isNameSet && state == State.SetByNew);
+                .CombineLatest(CurrentState, (isNameSet, state) => isNameSet && state == SetByState.New);
             var latestAddUserStream = _addUserStream.Switch();
             var isAddUserInProgressStream = latestAddUserStream.Select(notification => notification.Kind == NotificationKind.OnNext);
             var canSubmitStream = isExistingUserSelectedStream
@@ -90,13 +49,13 @@ namespace BabyBrother.ViewModels
                 .CombineLatest(isAddUserInProgressStream, (isUserInfoSet, isAddUserInProgress) => isUserInfoSet && !isAddUserInProgress);
 
             var submitCommand = new ReactiveCommand(canSubmitStream);
-            _subscriptions.Add(submitCommand.Subscribe(_ =>
+            AddSubscription(submitCommand.Subscribe(_ =>
             {
                 OnSubmit();
             }));
             SubmitCommand = submitCommand;
 
-            _subscriptions.Add(latestAddUserStream
+            AddSubscription(latestAddUserStream
                 .Where(notification => notification.Kind == NotificationKind.OnError)
                 .ObserveOn(SynchronizationContext.Current)
                 .Subscribe(async (_) =>
@@ -106,26 +65,10 @@ namespace BabyBrother.ViewModels
                         _resourceService.GetString("SetUserCreateProfileErrorTitle"));
                 }));
 
-            ExistingUsersLoadState = userStream.Materialize()
-                .Select(notification => notification.Kind == NotificationKind.OnError ? LoadState.LoadedError : LoadState.Loaded)
-                .CombineLatest(userStream.Any(), (loadState, isAny) => 
-                {
-                    return loadState == LoadState.LoadedError ? 
-                        LoadState.LoadedError : 
-                        (isAny ? LoadState.Loaded : LoadState.LoadedEmpty);
-                })
-                .StartWith(LoadState.Loading)
-                .Catch(Observable.Return(LoadState.LoadedError))
-                .ToReactiveProperty();
-            _subscriptions.Add(ExistingUsersLoadState);
+            InitializeExistingItems(_backendService.GetUsers());
         }
 
-        public void Dispose()
-        {
-            _subscriptions.Dispose();
-        }
-
-        public void SelectExistingUser(User user)
+        public override void SelectExistingItem(User user)
         {
             _userSelectionStream.OnNext(user);
         }
@@ -133,7 +76,7 @@ namespace BabyBrother.ViewModels
         private void OnSubmit()
         {
             var newName = NewUsername.Value;
-            if (!string.IsNullOrWhiteSpace(newName) && CurrentState.Value == State.SetByNew)
+            if (!string.IsNullOrWhiteSpace(newName) && CurrentState.Value == SetByState.New)
             {
                 var user = new User
                 {

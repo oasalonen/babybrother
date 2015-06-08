@@ -50,28 +50,23 @@ namespace BabyBrother.UnitTest
         [TestMethod]
         public void TestInitialStateIsSetByNew()
         {
-            Assert.AreEqual(SetUserPageViewModel.State.SetByNew, _viewModel.CurrentState.Value);
+            Assert.AreEqual(SetByState.New, _viewModel.CurrentState.Value);
         }
 
-        [TestMethod]
-        public void TestIsExistingUsersAvailableIsFalseInitially()
-        {
-            Assert.AreEqual(false, _viewModel.IsExistingUsersAvailable.Value);
-        }
 
         [TestMethod]
         public void TestSetByExistingCommandSetsStateToExisting()
         {
             _viewModel.SetByExistingCommand.Execute(null);
-            Assert.AreEqual(SetUserPageViewModel.State.SetByExisting, _viewModel.CurrentState.Value);
+            Assert.AreEqual(SetByState.Existing, _viewModel.CurrentState.Value);
         }
 
         [TestMethod]
         public void TestSetByNewCommandSetsStateToNew()
         {
-            _viewModel.CurrentState.Value = SetUserPageViewModel.State.SetByExisting;
+            _viewModel.CurrentState.Value = SetByState.Existing;
             _viewModel.SetByNewCommand.Execute(null);
-            Assert.AreEqual(SetUserPageViewModel.State.SetByNew, _viewModel.CurrentState.Value);
+            Assert.AreEqual(SetByState.New, _viewModel.CurrentState.Value);
         }
 
         [TestMethod]
@@ -123,15 +118,15 @@ namespace BabyBrother.UnitTest
         }
 
         [DataTestMethod]
-        [DataRow("", SetUserPageViewModel.State.SetByNew, false, false, DisplayName = "Set by new with no name cannot exec")]
-        [DataRow("a", SetUserPageViewModel.State.SetByNew, false, true, DisplayName = "Set by new with name can exec")]
-        [DataRow("", SetUserPageViewModel.State.SetByExisting, false, false, DisplayName = "Set by existing with no selection cannot exec")]
-        [DataRow("", SetUserPageViewModel.State.SetByExisting, true, true, DisplayName = "Set by existing with selection can exec")]
-        public void TestSubmitCommandCanExecuteIsSetCorrectly(string name, SetUserPageViewModel.State state, bool isUserSelected, bool expectedCanExecute)
+        [DataRow("", SetByState.New, false, false, DisplayName = "Set by new with no name cannot exec")]
+        [DataRow("a", SetByState.New, false, true, DisplayName = "Set by new with name can exec")]
+        [DataRow("", SetByState.Existing, false, false, DisplayName = "Set by existing with no selection cannot exec")]
+        [DataRow("", SetByState.Existing, true, true, DisplayName = "Set by existing with selection can exec")]
+        public void TestSubmitCommandCanExecuteIsSetCorrectly(string name, SetByState state, bool isUserSelected, bool expectedCanExecute)
         {
             _viewModel.NewUsername.Value = name;
             _viewModel.CurrentState.Value = state;
-            _viewModel.SelectExistingUser(isUserSelected ? new User { Name = name } : null);
+            _viewModel.SelectExistingItem(isUserSelected ? new User { Name = name } : null);
             Assert.AreEqual(expectedCanExecute, _viewModel.SubmitCommand.CanExecute(null));
         }
 
@@ -149,18 +144,12 @@ namespace BabyBrother.UnitTest
                 .OccursOnce();
 
             var viewModel = new SetUserPageViewModel(backendService, _notificationService, _resourceService);
-            CollectionAssert.AreEquivalent(users, viewModel.ExistingUsers);
+            CollectionAssert.AreEquivalent(users, viewModel.ExistingItems);
             Mock.Assert(backendService);
         }
 
         [TestMethod]
-        public void TestIsExistingUsersAvailableIsFalseWhenBackendReturnsNone()
-        {
-            Assert.IsFalse(_viewModel.IsExistingUsersAvailable.Value);
-        }
-
-        [TestMethod]
-        public void TestIsExistingUsersAvailableIsTrueWhenBackendReturnsSome()
+        public void TestExistingItemsExistWhenBackendReturnsSome()
         {
             var backendService = Mock.Create<IBackendService>();
             var users = new List<User>
@@ -173,7 +162,7 @@ namespace BabyBrother.UnitTest
                 .MustBeCalled();
 
             var viewModel = new SetUserPageViewModel(backendService, _notificationService, _resourceService);
-            Assert.IsTrue(viewModel.IsExistingUsersAvailable.Value);
+            Assert.AreEqual(2, viewModel.ExistingItems.Count);
             Mock.Assert(backendService);
         }
 
@@ -185,8 +174,7 @@ namespace BabyBrother.UnitTest
                 .Returns(() => Observable.Throw<User>(new Exception()));
 
             var viewModel = new SetUserPageViewModel(backendService, _notificationService, _resourceService);
-            Assert.IsFalse(viewModel.IsExistingUsersAvailable.Value);
-            Assert.AreEqual(0, viewModel.ExistingUsers.Count);
+            Assert.AreEqual(0, viewModel.ExistingItems.Count);
         }
 
         [TestMethod]
@@ -197,7 +185,7 @@ namespace BabyBrother.UnitTest
 
             using (var viewModel = CreateViewModel())
             {
-                Assert.AreEqual(LoadState.Loading, viewModel.ExistingUsersLoadState.Value);
+                Assert.AreEqual(LoadState.Loading, viewModel.ExistingItemsLoadState.Value);
             }
         }
 
@@ -209,7 +197,7 @@ namespace BabyBrother.UnitTest
 
             using (var viewModel = CreateViewModel())
             {
-                await viewModel.ExistingUsersLoadState.AssertNextValueIs(LoadState.LoadedEmpty);
+                await viewModel.ExistingItemsLoadState.AssertNextValueIs(LoadState.LoadedEmpty);
             }
         }
 
@@ -221,7 +209,7 @@ namespace BabyBrother.UnitTest
 
             using (var viewModel = CreateViewModel())
             {
-                await viewModel.ExistingUsersLoadState.AssertNextValueIs(LoadState.Loaded);
+                await viewModel.ExistingItemsLoadState.AssertNextValueIs(LoadState.Loaded);
             }
         }
 
@@ -233,7 +221,7 @@ namespace BabyBrother.UnitTest
 
             using (var viewModel = CreateViewModel())
             {
-                await viewModel.ExistingUsersLoadState.AssertNextValueIs(LoadState.LoadedError);
+                await viewModel.ExistingItemsLoadState.AssertNextValueIs(LoadState.LoadedError);
             }
         }
 

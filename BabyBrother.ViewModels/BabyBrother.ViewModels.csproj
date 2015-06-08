@@ -54,8 +54,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\LoadState.cs" />
+    <Compile Include="SetInfantPageViewModel.cs" />
     <Compile Include="SetUserPageViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SetItemViewModel.cs" />
+    <Compile Include="ViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.WindowsAzure.Mobile">
