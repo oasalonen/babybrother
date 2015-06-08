@@ -14,6 +14,11 @@
             <converters:VisibilityConverter x:Key="InvertedVisibilityConverter" IsInverted="True" />
             <converters:SetByButtonSelectionConverter x:Key="SetByNewButtonSelectionConverter" />
             <converters:SetByButtonSelectionConverter x:Key="SetByExistingButtonSelectionConverter" IsInverted="True" />
+            <converters:LoadStateToVisibilityConverter x:Key="LoadingUsersVisibilityConverter" IsLoadingControl="True" />
+            <converters:LoadStateToVisibilityConverter x:Key="LoadedNoUsersVisibilityConverter" IsLoadedEmptyControl="True" />
+            <converters:LoadStateToVisibilityConverter x:Key="LoadedUsersVisibilityConverter" IsLoadedDataControl="True" />
+            <converters:LoadStateToVisibilityConverter x:Key="LoadedUsersErrorVisibilityConverter" IsLoadedErrorControl="True" />
+            
             <Thickness x:Key="SubsectionMargin">30,5,0,0</Thickness>
             <Thickness x:Key="SectionMargin">0,0,0,20</Thickness>
             
@@ -75,27 +80,57 @@
                             />
                     </local:ExpandingControl.Header>
                     <local:ExpandingControl.Body>
-                        <StackPanel Margin="{StaticResource SubsectionMargin}">
+                        <Grid
+                            Margin="{StaticResource SubsectionMargin}" 
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
                             <TextBlock 
                                 Text="No existing profiles" 
-                                Visibility="{Binding IsExistingUsersAvailable.Value, Converter={StaticResource InvertedVisibilityConverter}}"
+                                Visibility="{Binding ExistingUsersLoadState.Value, Converter={StaticResource LoadedNoUsersVisibilityConverter}}"
+                                />
+                            <TextBlock 
+                                Text="Could not fetch existing profiles. Please make sure you are connected to the internet or try again later."
+                                TextWrapping="WrapWholeWords"
+                                Visibility="{Binding ExistingUsersLoadState.Value, Converter={StaticResource LoadedUsersErrorVisibilityConverter}}"
                                 />
                             <ListView 
                                 ItemsSource="{Binding ExistingUsers}"
                                 SelectionMode="Single"
-                                Visibility="{Binding IsExistingUsersAvailable.Value, Converter={StaticResource VisibilityConverter}}"
-                                SelectionChanged="OnExistingUserSelectionChanged">
+                                Visibility="{Binding ExistingUsersLoadState.Value, Converter={StaticResource LoadedUsersVisibilityConverter}}"
+                                SelectionChanged="OnExistingUserSelectionChanged"
+                                HorizontalContentAlignment="Stretch"
+                                HorizontalAlignment="Stretch">
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock 
                                             Text="{Binding Name}"
                                             Margin="5"
-                                            Width="300"
+                                            HorizontalAlignment="Stretch"
                                             />
                                     </DataTemplate>
                                 </ListView.ItemTemplate>
                             </ListView>
-                        </StackPanel>
+                            <Grid 
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <ProgressRing
+                                    Grid.Row="0"
+                                    Visibility="{Binding ExistingUsersLoadState.Value, Converter={StaticResource LoadingUsersVisibilityConverter}}"
+                                    IsActive="True"
+                                    HorizontalAlignment="Center"
+                                    />
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Text="Loading existing profiles..."
+                                    Visibility="{Binding ExistingUsersLoadState.Value, Converter={StaticResource LoadingUsersVisibilityConverter}}"
+                                    HorizontalAlignment="Center"
+                                    />
+                            </Grid>
+                        </Grid>
                     </local:ExpandingControl.Body>
                 </local:ExpandingControl>
             </StackPanel>

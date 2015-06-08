@@ -10,6 +10,8 @@ using System.Threading;
 using BabyBrother.Models;
 using System.Reactive.Linq;
 using System.Reactive;
+using BabyBrother.ViewModels.Common;
+using System.Threading.Tasks;
 
 namespace BabyBrother.UnitTest
 {
@@ -185,6 +187,59 @@ namespace BabyBrother.UnitTest
             var viewModel = new SetUserPageViewModel(backendService, _notificationService, _resourceService);
             Assert.IsFalse(viewModel.IsExistingUsersAvailable.Value);
             Assert.AreEqual(0, viewModel.ExistingUsers.Count);
+        }
+
+        [TestMethod]
+        public void TestExistingUsersLoadStateIsLoadingInitially()
+        {
+            Mock.Arrange(() => _backendService.GetUsers())
+                .Returns(() => Observable.Never<User>());
+
+            using (var viewModel = CreateViewModel())
+            {
+                Assert.AreEqual(LoadState.Loading, viewModel.ExistingUsersLoadState.Value);
+            }
+        }
+
+        [TestMethod]
+        public async Task TestExistingUsersLoadStateIsEmptyIfNoUsersReturned()
+        {
+            Mock.Arrange(() => _backendService.GetUsers())
+                .Returns(() => Observable.Empty<User>());
+
+            using (var viewModel = CreateViewModel())
+            {
+                await viewModel.ExistingUsersLoadState.AssertNextValueIs(LoadState.LoadedEmpty);
+            }
+        }
+
+        [TestMethod]
+        public async Task TestExistingUsersLoadStateIsLoadedIfUsersReturned()
+        {
+            Mock.Arrange(() => _backendService.GetUsers())
+                .Returns(() => Observable.Return(new User()));
+
+            using (var viewModel = CreateViewModel())
+            {
+                await viewModel.ExistingUsersLoadState.AssertNextValueIs(LoadState.Loaded);
+            }
+        }
+
+        [TestMethod]
+        public async Task TestExistingUsersLoadStateIsErrorIfExceptionIsThrown()
+        {
+            Mock.Arrange(() => _backendService.GetUsers())
+                .Returns(() => Observable.Throw<User>(new Exception()));
+
+            using (var viewModel = CreateViewModel())
+            {
+                await viewModel.ExistingUsersLoadState.AssertNextValueIs(LoadState.LoadedError);
+            }
+        }
+
+        private SetUserPageViewModel CreateViewModel()
+        {
+            return new SetUserPageViewModel(_backendService, _notificationService, _resourceService);
         }
     }
 }

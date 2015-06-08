@@ -1,5 +1,6 @@
 ﻿using BabyBrother.Models;
 using BabyBrother.Services;
+using BabyBrother.ViewModels.Common;
 using Reactive.Bindings;
 using System;
 using System.Reactive;
@@ -31,6 +32,8 @@ namespace BabyBrother.ViewModels
         public ReactiveProperty<string> NewUsername { get; private set; }
 
         public ReactiveProperty<bool> IsExistingUsersAvailable { get; private set; }
+
+        public ReactiveProperty<LoadState> ExistingUsersLoadState { get; private set; }
 
         // TODO: make readonly
         public ReactiveCollection<User> ExistingUsers { get; private set; }
@@ -102,6 +105,19 @@ namespace BabyBrother.ViewModels
                         _resourceService.GetString("SetUserCreateProfileErrorMessage"),
                         _resourceService.GetString("SetUserCreateProfileErrorTitle"));
                 }));
+
+            ExistingUsersLoadState = userStream.Materialize()
+                .Select(notification => notification.Kind == NotificationKind.OnError ? LoadState.LoadedError : LoadState.Loaded)
+                .CombineLatest(userStream.Any(), (loadState, isAny) => 
+                {
+                    return loadState == LoadState.LoadedError ? 
+                        LoadState.LoadedError : 
+                        (isAny ? LoadState.Loaded : LoadState.LoadedEmpty);
+                })
+                .StartWith(LoadState.Loading)
+                .Catch(Observable.Return(LoadState.LoadedError))
+                .ToReactiveProperty();
+            _subscriptions.Add(ExistingUsersLoadState);
         }
 
         public void Dispose()
