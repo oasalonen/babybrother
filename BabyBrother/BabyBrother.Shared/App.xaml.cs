@@ -1,10 +1,14 @@
-﻿using System;
+﻿using BabyBrother.Services;
+using BabyBrother.Services.Implementations;
+using SimpleInjector;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.Resources;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -29,6 +33,8 @@ namespace BabyBrother
         private TransitionCollection transitions;
 #endif
 
+        public static Container Container { get; private set; }
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -37,6 +43,8 @@ namespace BabyBrother
         {
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
+
+            RegisterServices();
         }
 
         /// <summary>
@@ -132,6 +140,15 @@ namespace BabyBrother
 
             // TODO: Save application state and stop any background activity
             deferral.Complete();
+        }
+
+        private void RegisterServices()
+        {
+            Container = new SimpleInjector.Container();
+
+            Container.RegisterSingle<IBackendService, AzureBackendService>();
+            Container.RegisterSingle<INotificationService, WindowsNotificationService>();
+            Container.RegisterSingle<IResourceService>(new WindowsResourceService(ResourceLoader.GetForViewIndependentUse("Strings")));
         }
     }
 }

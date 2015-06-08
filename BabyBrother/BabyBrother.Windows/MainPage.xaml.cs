@@ -32,8 +32,7 @@ namespace BabyBrother
 
         public MainPage()
         {
-            var stringResourceLoader = ResourceLoader.GetForViewIndependentUse("Strings");
-            DataContext = _viewModel = new SetUserPageViewModel(new AzureBackendService(), new WindowsNotificationService(), new WindowsResourceService(stringResourceLoader));
+            DataContext = _viewModel = App.Container.GetInstance<SetUserPageViewModel>();
             this.InitializeComponent();
 
             _subscriptions = new CompositeDisposable();
