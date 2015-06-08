@@ -25,12 +25,12 @@ namespace BabyBrother
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainPage : Page
+    public sealed partial class SetUserPage : Page
     {
         private SetUserPageViewModel _viewModel;
         private CompositeDisposable _subscriptions;
 
-        public MainPage()
+        public SetUserPage()
         {
             DataContext = _viewModel = App.Container.GetInstance<SetUserPageViewModel>();
             this.InitializeComponent();

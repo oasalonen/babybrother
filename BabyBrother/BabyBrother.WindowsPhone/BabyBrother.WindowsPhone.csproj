@@ -150,6 +150,24 @@
       <HintPath>..\..\packages\Rx-PlatformServices.2.2.5\lib\portable-win81+wpa81\System.Reactive.PlatformServices.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\BabyBrother.Base\BabyBrother.Base.csproj">
+      <Project>{7420bd77-5a58-42fa-9080-e726f418da2a}</Project>
+      <Name>BabyBrother.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BabyBrother.Models\BabyBrother.Models.csproj">
+      <Project>{8d2eceaf-6e23-42e6-9cd8-db8ff6192064}</Project>
+      <Name>BabyBrother.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BabyBrother.Services\BabyBrother.Services.csproj">
+      <Project>{21e17eae-1ddc-416d-91ba-0524aa05306b}</Project>
+      <Name>BabyBrother.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BabyBrother.ViewModels\BabyBrother.ViewModels.csproj">
+      <Project>{02ddcca2-3a2e-4602-b359-cb732c859e2f}</Project>
+      <Name>BabyBrother.ViewModels</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>
