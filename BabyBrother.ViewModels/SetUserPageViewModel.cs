@@ -22,6 +22,8 @@ namespace BabyBrother.ViewModels
 
         public ReactiveProperty<string> NewUsername { get; private set; }
 
+        public ReactiveProperty<bool> IsSubmitting { get; private set; }
+
         public ICommand SubmitCommand { get; private set; }
 
         public SetUserPageViewModel(IBackendService backendService, INotificationService notificationService, IResourceService resourceService)
@@ -54,6 +56,12 @@ namespace BabyBrother.ViewModels
                 OnSubmit();
             }));
             SubmitCommand = submitCommand;
+
+            // TODO: This doesnt work, probably because isAddUserInProgressStream does not work as expected
+            IsSubmitting = isAddUserInProgressStream
+                .Catch(Observable.Empty<bool>())
+                .ToReactiveProperty();
+            AddSubscription(IsSubmitting);
 
             AddSubscription(latestAddUserStream
                 .Where(notification => notification.Kind == NotificationKind.OnError)

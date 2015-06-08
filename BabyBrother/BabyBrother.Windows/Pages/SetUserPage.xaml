@@ -132,9 +132,45 @@
                 <Button
                     x:Uid="NextButton"
                     HorizontalAlignment="Stretch"
-                    Command="{Binding SubmitCommand}"/>
+                    Command="{Binding SubmitCommand}">
+                    <Button.RenderTransform>
+                        <TranslateTransform x:Name="SubmitButtonTransform" Y="0"/>
+                    </Button.RenderTransform>
+                </Button>
+                <ProgressRing
+                    x:Name="SubmitProgress"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    IsActive="True"
+                    Visibility="Collapsed"/>
             </Grid>
         </Grid>
+        
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState x:Name="NotSubmitting"/>
+                <VisualState x:Name="Submitting">
+                    <Storyboard>
+                        <DoubleAnimation 
+                            Storyboard.TargetName="SubmitButtonTransform"
+                            Storyboard.TargetProperty="Y"
+                            Duration="0:0:0.5"
+                            From="0"
+                            To="500">
+                            <DoubleAnimation.EasingFunction>
+                                <CubicEase EasingMode="EaseOut"/>
+                            </DoubleAnimation.EasingFunction>
+                        </DoubleAnimation>
+                        
+                        <ObjectAnimationUsingKeyFrames 
+                            Storyboard.TargetName="SubmitProgress"
+                            Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
     </Grid>
    
 </Page>

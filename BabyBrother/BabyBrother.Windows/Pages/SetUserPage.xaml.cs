@@ -36,10 +36,14 @@ namespace BabyBrother.Pages
             this.InitializeComponent();
 
             _subscriptions = new CompositeDisposable();
-            _subscriptions.Add(_viewModel.CurrentState.Subscribe((state) =>
+            _subscriptions.Add(_viewModel.CurrentState.Subscribe(state =>
             {
                 NewUserSection.CurrentState = (state == SetByState.New ? ExpandingControl.State.Expanded : ExpandingControl.State.Collapsed);
                 ExistingUserSection.CurrentState = (state == SetByState.Existing ? ExpandingControl.State.Expanded : ExpandingControl.State.Collapsed);
+            }));
+            _subscriptions.Add(_viewModel.IsSubmitting.Subscribe(isSubmitting =>
+            {
+                VisualStateManager.GoToState(this, isSubmitting ? "Submitting" : "NotSubmitting", false);
             }));
             _subscriptions.Add(_viewModel);
         }
