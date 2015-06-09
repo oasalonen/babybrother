@@ -18,6 +18,7 @@
             <converters:LoadStateToVisibilityConverter x:Key="LoadedNoItemsVisibilityConverter" IsLoadedEmptyControl="True" />
             <converters:LoadStateToVisibilityConverter x:Key="LoadedItemsVisibilityConverter" IsLoadedDataControl="True" />
             <converters:LoadStateToVisibilityConverter x:Key="LoadedItemsErrorVisibilityConverter" IsLoadedErrorControl="True" />
+            <converters:InvertedBooleanConverter x:Key="InvertedBooleanConverter" />
         </Grid.Resources>
 
         <!--<Image Source="Assets/pregnantbelly.png" />-->
@@ -45,6 +46,7 @@
                             GroupName="SetMethodGroup"
                             Command="{Binding SetByNewCommand}"
                             IsChecked="{Binding CurrentState.Value, Converter={StaticResource SetByNewButtonSelectionConverter}}"
+                            IsEnabled="{Binding IsSubmitting.Value, Converter={StaticResource InvertedBooleanConverter}}"
                             />
                     </local:ExpandingControl.Header>
                     <local:ExpandingControl.Body>
@@ -55,6 +57,7 @@
                                         x:Uid="SetUserPageUserNameText"
                                         MinWidth="300"
                                         Text="{Binding NewUsername.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        IsEnabled="{Binding IsSubmitting.Value, Converter={StaticResource InvertedBooleanConverter}}"
                                         />
                                 </local:FormEntry.Field>
                             </local:FormEntry>
@@ -71,6 +74,7 @@
                             GroupName="SetMethodGroup"
                             Command="{Binding SetByExistingCommand}"
                             IsChecked="{Binding CurrentState.Value, Converter={StaticResource SetByExistingButtonSelectionConverter}}"
+                            IsEnabled="{Binding IsSubmitting.Value, Converter={StaticResource InvertedBooleanConverter}}"
                             />
                     </local:ExpandingControl.Header>
                     <local:ExpandingControl.Body>
@@ -93,7 +97,8 @@
                                 Visibility="{Binding ExistingItemsLoadState.Value, Converter={StaticResource LoadedItemsVisibilityConverter}}"
                                 SelectionChanged="OnExistingUserSelectionChanged"
                                 HorizontalContentAlignment="Stretch"
-                                HorizontalAlignment="Stretch">
+                                HorizontalAlignment="Stretch"
+                                IsEnabled="{Binding IsSubmitting.Value, Converter={StaticResource InvertedBooleanConverter}}">
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock 
