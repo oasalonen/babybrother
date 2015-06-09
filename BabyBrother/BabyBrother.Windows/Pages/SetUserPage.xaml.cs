@@ -5,8 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using Windows.ApplicationModel.Resources;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -36,15 +38,19 @@ namespace BabyBrother.Pages
             this.InitializeComponent();
 
             _subscriptions = new CompositeDisposable();
-            _subscriptions.Add(_viewModel.CurrentState.Subscribe(state =>
-            {
-                NewUserSection.CurrentState = (state == SetByState.New ? ExpandingControl.State.Expanded : ExpandingControl.State.Collapsed);
-                ExistingUserSection.CurrentState = (state == SetByState.Existing ? ExpandingControl.State.Expanded : ExpandingControl.State.Collapsed);
-            }));
-            _subscriptions.Add(_viewModel.IsSubmitting.Subscribe(isSubmitting =>
-            {
-                VisualStateManager.GoToState(this, isSubmitting ? "Submitting" : "NotSubmitting", false);
-            }));
+            _subscriptions.Add(_viewModel.CurrentState
+                .ObserveOn(SynchronizationContext.Current)
+                .Subscribe(state =>
+                {
+                    NewUserSection.CurrentState = (state == SetByState.New ? ExpandingControl.State.Expanded : ExpandingControl.State.Collapsed);
+                    ExistingUserSection.CurrentState = (state == SetByState.Existing ? ExpandingControl.State.Expanded : ExpandingControl.State.Collapsed);
+                }));
+            _subscriptions.Add(_viewModel.IsSubmitting
+                .ObserveOn(SynchronizationContext.Current)
+                .Subscribe(isSubmitting =>
+                {
+                    VisualStateManager.GoToState(this, isSubmitting ? "Submitting" : "NotSubmitting", false);
+                }));
             _subscriptions.Add(_viewModel);
         }
 

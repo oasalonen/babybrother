@@ -38,17 +38,22 @@ namespace BabyBrother.ViewModels
             NewUsername = new ReactiveProperty<string>();
             AddSubscription(NewUsername);
 
+            var latestAddUserStream = _addUserStream.Switch();
+            IsSubmitting = _addUserStream.Select(_ => true)
+                .Merge(latestAddUserStream.Select(notification => notification.Kind == NotificationKind.OnNext))
+                .Catch(Observable.Empty<bool>())
+                .ToReactiveProperty();
+            AddSubscription(IsSubmitting);
+
             var isExistingUserSelectedStream = _userSelectionStream
                 .Select(user => user != null)
                 .CombineLatest(CurrentState, (isUserSelected, state) => isUserSelected && state == SetByState.Existing);
             var isNewUsernameSetStream = NewUsername
                 .Select(name => !string.IsNullOrWhiteSpace(name))
                 .CombineLatest(CurrentState, (isNameSet, state) => isNameSet && state == SetByState.New);
-            var latestAddUserStream = _addUserStream.Switch();
-            var isAddUserInProgressStream = latestAddUserStream.Select(notification => notification.Kind == NotificationKind.OnNext);
             var canSubmitStream = isExistingUserSelectedStream
                 .CombineLatest(isNewUsernameSetStream, (isNameSet, isUserSelected) => isNameSet || isUserSelected)
-                .CombineLatest(isAddUserInProgressStream, (isUserInfoSet, isAddUserInProgress) => isUserInfoSet && !isAddUserInProgress);
+                .CombineLatest(IsSubmitting, (isUserInfoSet, isAddUserInProgress) => isUserInfoSet && !isAddUserInProgress);
 
             var submitCommand = new ReactiveCommand(canSubmitStream);
             AddSubscription(submitCommand.Subscribe(_ =>
@@ -56,12 +61,6 @@ namespace BabyBrother.ViewModels
                 OnSubmit();
             }));
             SubmitCommand = submitCommand;
-
-            // TODO: This doesnt work, probably because isAddUserInProgressStream does not work as expected
-            IsSubmitting = isAddUserInProgressStream
-                .Catch(Observable.Empty<bool>())
-                .ToReactiveProperty();
-            AddSubscription(IsSubmitting);
 
             AddSubscription(latestAddUserStream
                 .Where(notification => notification.Kind == NotificationKind.OnError)

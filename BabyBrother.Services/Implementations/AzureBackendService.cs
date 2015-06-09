@@ -30,7 +30,6 @@ namespace BabyBrother.Services.Implementations
         public IObservable<Unit> AddUser(User user)
         {
             return _userTable.InsertAsync(user).ToObservable();
-            //return Observable.Empty<Unit>().Delay(TimeSpan.FromSeconds(5));
         }
 
         public IObservable<User> GetUsers()

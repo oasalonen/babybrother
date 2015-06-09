@@ -55,18 +55,19 @@ namespace BabyBrother.UnitTest
 
 
         [TestMethod]
-        public void TestSetByExistingCommandSetsStateToExisting()
+        public async Task TestSetByExistingCommandSetsStateToExisting()
         {
-            _viewModel.SetByExistingCommand.Execute(null);
-            Assert.AreEqual(SetByState.Existing, _viewModel.CurrentState.Value);
+            var expected = new List<SetByState> { SetByState.New, SetByState.Existing };
+            await _viewModel.CurrentState.AssertNextValueIs(expected, () => _viewModel.SetByExistingCommand.Execute(null));
         }
 
         [TestMethod]
-        public void TestSetByNewCommandSetsStateToNew()
+        public async Task TestSetByNewCommandSetsStateToNew()
         {
             _viewModel.CurrentState.Value = SetByState.Existing;
-            _viewModel.SetByNewCommand.Execute(null);
-            Assert.AreEqual(SetByState.New, _viewModel.CurrentState.Value);
+
+            var expected = new List<SetByState> { SetByState.Existing, SetByState.New };
+            await _viewModel.CurrentState.AssertNextValueIs(expected, () => _viewModel.SetByNewCommand.Execute(null));
         }
 
         [TestMethod]
@@ -128,6 +129,17 @@ namespace BabyBrother.UnitTest
             _viewModel.CurrentState.Value = state;
             _viewModel.SelectExistingItem(isUserSelected ? new User { Name = name } : null);
             Assert.AreEqual(expectedCanExecute, _viewModel.SubmitCommand.CanExecute(null));
+        }
+
+        [TestMethod]
+        public async Task TestSubmitCommandSetsIsSubmittingToTrueWhenAddingUser()
+        {
+            _viewModel.NewUsername.Value = "name";
+            Mock.Arrange(() => _backendService.AddUser(Arg.IsAny<User>()))
+                .Returns(() => Observable.Never<Unit>());
+
+            var expectedValues = new List<bool> { false, true };
+            await _viewModel.IsSubmitting.AssertNextValueIs(expectedValues, () => _viewModel.SubmitCommand.Execute(null));
         }
 
         [TestMethod]
