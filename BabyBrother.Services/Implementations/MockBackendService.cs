@@ -16,6 +16,11 @@ namespace BabyBrother.Services.Implementations
             return Observable.Empty<Unit>().Delay(TimeSpan.FromSeconds(3));
         }
 
+        public IObservable<Unit> AddInfant(Infant infant)
+        {
+            return Observable.Empty<Unit>().Delay(TimeSpan.FromSeconds(3));
+        }
+
         public IObservable<User> GetUsers()
         {
             return Observable.Return(new User { Name = "joe" }).Delay(TimeSpan.FromSeconds(3));

@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,28 @@ namespace BabyBrother.UnitTest
 {
     internal static class Utilities
     {
+        public static async Task AssertEqualsAsync<T>(T expected, Func<T> actual, TimeSpan? timeout = null)
+        {
+            if (timeout == null)
+            {
+                timeout = TimeSpan.FromSeconds(5);
+            }
+
+            T lastValue = default(T);
+            var stopwatch = Stopwatch.StartNew();
+            do
+            {
+                lastValue = actual();
+                if (expected.Equals(lastValue))
+                {
+                    break;
+                }
+                await Task.Delay(10);
+            }
+            while (stopwatch.Elapsed < timeout.Value);
+            Assert.AreEqual(expected, lastValue);
+        }
+
         public static Task AssertNextValueIs<T>(this IObservable<T> source, T expected)
         {
             return source.AssertNextValueIs(expected, () => { });

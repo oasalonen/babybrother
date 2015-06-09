@@ -32,6 +32,11 @@ namespace BabyBrother.Services.Implementations
             return _userTable.InsertAsync(user).ToObservable();
         }
 
+        public IObservable<Unit> AddInfant(Infant infant)
+        {
+            return _infantTable.InsertAsync(infant).ToObservable();
+        }
+
         public IObservable<User> GetUsers()
         {
             return Observable.StartAsync(() => _userTable.ToListAsync())

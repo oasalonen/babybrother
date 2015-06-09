@@ -129,6 +129,12 @@
   <data name="NextButton.Content" xml:space="preserve">
     <value>Next</value>
   </data>
+  <data name="SetInfantCreateProfileErrorMessage" xml:space="preserve">
+    <value>We were unable to create your baby profile at this time. Make sure you are connected to the internet. Otherwise, try again later.</value>
+  </data>
+  <data name="SetInfantCreateProfileErrorTitle" xml:space="preserve">
+    <value>Could not create baby profile</value>
+  </data>
   <data name="SetInfantPageCreateInfantSection.Content" xml:space="preserve">
     <value>Create a new baby profile</value>
   </data>

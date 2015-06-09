@@ -59,7 +59,7 @@ namespace BabyBrother.Pages
 
         private void OnGenderSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _viewModel.Gender.Value = e.AddedItems as SetInfantPageViewModel.GenderItem;
+            _viewModel.Gender.Value = e.AddedItems.FirstOrDefault() as SetInfantPageViewModel.GenderItem;
         }
     }
 }

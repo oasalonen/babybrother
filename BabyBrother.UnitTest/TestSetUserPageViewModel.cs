@@ -161,7 +161,7 @@ namespace BabyBrother.UnitTest
         }
 
         [TestMethod]
-        public void TestExistingItemsExistWhenBackendReturnsSome()
+        public async Task TestExistingItemsExistWhenBackendReturnsSome()
         {
             var backendService = Mock.Create<IBackendService>();
             var users = new List<User>
@@ -174,7 +174,7 @@ namespace BabyBrother.UnitTest
                 .MustBeCalled();
 
             var viewModel = new SetUserPageViewModel(backendService, _notificationService, _resourceService);
-            Assert.AreEqual(2, viewModel.ExistingItems.Count);
+            await Utilities.AssertEqualsAsync(2, () => viewModel.ExistingItems.Count);
             Mock.Assert(backendService);
         }
 

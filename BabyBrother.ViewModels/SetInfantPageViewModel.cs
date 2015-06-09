@@ -21,6 +21,7 @@ namespace BabyBrother.ViewModels
         }
 
         private readonly IBackendService _backendService;
+        private readonly INotificationService _notificationService;
         private readonly IResourceService _resourceService;
 
         public ReactiveProperty<string> Name { get; private set; }
@@ -31,9 +32,10 @@ namespace BabyBrother.ViewModels
 
         public ICollection<GenderItem> AvailableGenders { get; private set; }
 
-        public SetInfantPageViewModel(IBackendService backendService, IResourceService resourceService)
+        public SetInfantPageViewModel(IBackendService backendService, INotificationService notificationService, IResourceService resourceService)
         {
             _backendService = backendService;
+            _notificationService = notificationService;
             _resourceService = resourceService;
 
             Name = new ReactiveProperty<string>();
@@ -60,7 +62,7 @@ namespace BabyBrother.ViewModels
                 }
             };
 
-            Gender = new ReactiveProperty<GenderItem>(AvailableGenders.First());
+            Gender = new ReactiveProperty<GenderItem>();
             AddSubscription(Gender);
 
             InitializeExistingItems(_backendService.GetInfants());
@@ -69,20 +71,40 @@ namespace BabyBrother.ViewModels
 
         protected override IObservable<Unit> OnSubmit()
         {
-            throw new NotImplementedException();
+            var name = Name.Value;
+            if (!string.IsNullOrWhiteSpace(name) && 
+                Gender.Value != null &&
+                CurrentState.Value == SetByState.New)
+            {
+                var infant = new Infant
+                {
+                    Name = name,
+                    Gender = Gender.Value.Gender.ToString(),
+                    BirthDate = DateOfBirth.Value
+                };
+                return _backendService.AddInfant(infant);
+            }
+            else
+            {
+                return Observable.Empty<Unit>();
+            }
         }
 
-        protected override void OnSubmitError()
+        protected override async void OnSubmitError()
         {
-            throw new NotImplementedException();
+            await _notificationService.ShowBlockingMessageAsync(
+                _resourceService.GetString("SetInfantCreateProfileErrorMessage"),
+                _resourceService.GetString("SetInfantCreateProfileErrorTitle"));
         }
 
         protected override IObservable<bool> IsReadyToSubmit()
         {
             var isNameSetStream = Name.Select(name => !string.IsNullOrWhiteSpace(name));
+            var isGenderSetStream = Gender.Select(gender => gender != null);
             return CurrentState
                 .Select(state => state == SetByState.New)
-                .CombineLatest(isNameSetStream, (isSetNew, isNameSet) => isSetNew && isNameSet);
+                .CombineLatest(isNameSetStream, (isSetNew, isNameSet) => isSetNew && isNameSet)
+                .CombineLatest(isGenderSetStream, (isInfoSet, isGenderSet) => isInfoSet && isGenderSet);
         }
     }
 }
