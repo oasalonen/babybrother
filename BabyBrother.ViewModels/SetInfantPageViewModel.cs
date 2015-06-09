@@ -25,7 +25,7 @@ namespace BabyBrother.ViewModels
 
         public ReactiveProperty<string> Name { get; private set; }
 
-        public ReactiveProperty<DateTime> DateOfBirth { get; private set; }
+        public ReactiveProperty<DateTimeOffset> DateOfBirth { get; private set; }
 
         public ReactiveProperty<GenderItem> Gender { get; private set; }
 
@@ -39,7 +39,7 @@ namespace BabyBrother.ViewModels
             Name = new ReactiveProperty<string>();
             AddSubscription(Name);
 
-            DateOfBirth = new ReactiveProperty<DateTime>(DateTime.Now);
+            DateOfBirth = new ReactiveProperty<DateTimeOffset>(DateTimeOffset.Now);
 
             AvailableGenders = new List<GenderItem>
             {

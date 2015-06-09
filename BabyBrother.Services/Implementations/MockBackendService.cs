@@ -13,17 +13,17 @@ namespace BabyBrother.Services.Implementations
     {
         public IObservable<Unit> AddUser(User user)
         {
-            return Observable.Empty<Unit>();
+            return Observable.Empty<Unit>().Delay(TimeSpan.FromSeconds(3));
         }
 
         public IObservable<User> GetUsers()
         {
-            return Observable.Empty<User>();
+            return Observable.Return(new User { Name = "joe" }).Delay(TimeSpan.FromSeconds(3));
         }
 
         public IObservable<Infant> GetInfants()
         {
-            return Observable.Empty<Infant>();
+            return Observable.Return(new Infant { Name = "babyjim" }).Delay(TimeSpan.FromSeconds(3));
         }
     }
 }

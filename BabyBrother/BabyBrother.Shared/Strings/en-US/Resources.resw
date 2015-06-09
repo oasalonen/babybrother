@@ -150,6 +150,9 @@
   <data name="SetInfantPageInfantNameText.PlaceholderText" xml:space="preserve">
     <value>enter your baby's name</value>
   </data>
+  <data name="SetInfantPageLoadingInfants.Text" xml:space="preserve">
+    <value>Loading existing baby profiles...</value>
+  </data>
   <data name="SetInfantPageNoExistingInfants.Text" xml:space="preserve">
     <value>No existing profiles</value>
   </data>

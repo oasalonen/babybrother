@@ -7,5 +7,6 @@
     <Thickness x:Key="PageMargin">20,20,20,20</Thickness>
     <Thickness x:Key="SubsectionMargin">30,5,0,0</Thickness>
     <Thickness x:Key="SectionMargin">0,0,0,20</Thickness>
+    <Thickness x:Key="FormEntryMargin">0,0,0,10</Thickness>
     
 </ResourceDictionary>

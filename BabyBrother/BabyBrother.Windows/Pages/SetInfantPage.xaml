@@ -54,7 +54,8 @@
                             </Grid.RowDefinitions>
                             <local:FormEntry 
                                 x:Uid="SetInfantPageInfantNameField"
-                                Grid.Row="0">
+                                Grid.Row="0"
+                                Margin="{StaticResource FormEntryMargin}">
                                 <local:FormEntry.Field>
                                     <TextBox
                                         x:Uid="SetInfantPageInfantNameText"
@@ -65,7 +66,8 @@
                             </local:FormEntry>
                             <local:FormEntry 
                                 x:Uid="SetInfantPageGenderField"
-                                Grid.Row="1">
+                                Grid.Row="1"
+                                Margin="{StaticResource FormEntryMargin}">
                                 <local:FormEntry.Field>
                                     <ComboBox
                                         ItemsSource="{Binding AvailableGenders}"
@@ -80,9 +82,10 @@
                             </local:FormEntry>
                             <local:FormEntry 
                                 x:Uid="SetInfantPageDateOfBirthField"
-                                Grid.Row="2">
+                                Grid.Row="2"
+                                Margin="{StaticResource FormEntryMargin}">
                                 <local:FormEntry.Field>
-                                    <DatePicker Date="{Binding DateOfBirth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <DatePicker Date="{Binding DateOfBirth.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 </local:FormEntry.Field>
                             </local:FormEntry>
                         </Grid>
