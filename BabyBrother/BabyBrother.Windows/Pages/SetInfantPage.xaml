@@ -47,13 +47,42 @@
                     </local:ExpandingControl.Header>
                     <local:ExpandingControl.Body>
                         <Grid Margin="{StaticResource SubsectionMargin}">
-                            <local:FormEntry x:Uid="SetInfantPageInfantNameField">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <local:FormEntry 
+                                x:Uid="SetInfantPageInfantNameField"
+                                Grid.Row="0">
                                 <local:FormEntry.Field>
                                     <TextBox
                                         x:Uid="SetInfantPageInfantNameText"
                                         MinWidth="300"
-                                        Text="{Binding NewUsername.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        Text="{Binding Name.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         />
+                                </local:FormEntry.Field>
+                            </local:FormEntry>
+                            <local:FormEntry 
+                                x:Uid="SetInfantPageGenderField"
+                                Grid.Row="1">
+                                <local:FormEntry.Field>
+                                    <ComboBox
+                                        ItemsSource="{Binding AvailableGenders}"
+                                        SelectionChanged="OnGenderSelectionChanged">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding DisplayName}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </local:FormEntry.Field>
+                            </local:FormEntry>
+                            <local:FormEntry 
+                                x:Uid="SetInfantPageDateOfBirthField"
+                                Grid.Row="2">
+                                <local:FormEntry.Field>
+                                    <DatePicker Date="{Binding DateOfBirth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 </local:FormEntry.Field>
                             </local:FormEntry>
                         </Grid>

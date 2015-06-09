@@ -56,5 +56,10 @@ namespace BabyBrother.Pages
         {
             _viewModel.SelectExistingItem(e.AddedItems.FirstOrDefault() as Infant);
         }
+
+        private void OnGenderSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _viewModel.Gender.Value = e.AddedItems as SetInfantPageViewModel.GenderItem;
+        }
     }
 }

@@ -117,17 +117,32 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="GenderFemale" xml:space="preserve">
+    <value>female</value>
+  </data>
+  <data name="GenderMale" xml:space="preserve">
+    <value>male</value>
+  </data>
+  <data name="GenderOther" xml:space="preserve">
+    <value>other</value>
+  </data>
   <data name="NextButton.Content" xml:space="preserve">
     <value>Next</value>
   </data>
   <data name="SetInfantPageCreateInfantSection.Content" xml:space="preserve">
     <value>Create a new baby profile</value>
   </data>
+  <data name="SetInfantPageDateOfBirthField.Header" xml:space="preserve">
+    <value>date of birth</value>
+  </data>
   <data name="SetInfantPageErrorFetchingInfants.Text" xml:space="preserve">
     <value>Could not fetch existing profiles. Please make sure you are connected to the internet or try again later.</value>
   </data>
   <data name="SetInfantPageExistingInfantSection.Content" xml:space="preserve">
     <value>My baby already has a profile</value>
+  </data>
+  <data name="SetInfantPageGenderField.Header" xml:space="preserve">
+    <value>gender</value>
   </data>
   <data name="SetInfantPageInfantNameField.Header" xml:space="preserve">
     <value>profile name</value>
