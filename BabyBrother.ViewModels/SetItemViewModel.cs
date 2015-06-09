@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,18 +22,26 @@ namespace BabyBrother.ViewModels
     public abstract class SetItemViewModel<T> : ViewModel 
         where T : class
     {
+        private readonly ISubject<IObservable<Notification<Unit>>> _submitStream;
+
         public ReactiveProperty<SetByState> CurrentState { get; private set; }
 
         public ReactiveCollection<T> ExistingItems { get; private set; }
 
         public ReactiveProperty<LoadState> ExistingItemsLoadState { get; private set; }
 
+        public ReactiveProperty<bool> IsSubmitting { get; private set; }
+
         public ICommand SetByNewCommand { get; private set; }
 
         public ICommand SetByExistingCommand { get; private set; }
 
+        public ICommand SubmitCommand { get; private set; }
+
         public SetItemViewModel()
         {
+            _submitStream = new BehaviorSubject<IObservable<Notification<Unit>>>(Observable.Empty<Unit>().Materialize());
+
             // State switching setup
             var setUserByNew = new ReactiveCommand();
             var setUserByExisting = new ReactiveCommand();
@@ -47,6 +56,33 @@ namespace BabyBrother.ViewModels
                 .Merge(setByExistingStream)
                 .ToReactiveProperty(SetByState.New);
             AddSubscription(CurrentState);
+        }
+
+        protected void InitializeSubmit()
+        {
+            // Submit setup
+            var latestSubmitStream = _submitStream.Switch();
+            IsSubmitting = _submitStream.Select(_ => true)
+                .Merge(latestSubmitStream.Select(notification => notification.Kind == NotificationKind.OnNext))
+                .Catch(Observable.Empty<bool>())
+                .ToReactiveProperty();
+            AddSubscription(IsSubmitting);
+
+            var canSubmitStream = IsReadyToSubmit()
+                .CombineLatest(IsSubmitting, (isReadyToSubmit, isSubmitting) => isReadyToSubmit && !isSubmitting);
+            var submitCommand = new ReactiveCommand(canSubmitStream);
+            AddSubscription(submitCommand.Subscribe(_ => 
+            {
+                _submitStream.OnNext(OnSubmit()
+                    .Materialize()
+                    .Catch(Observable.Empty<Notification<Unit>>()));
+            }));
+            SubmitCommand = submitCommand;
+
+            AddSubscription(latestSubmitStream
+                .Where(notification => notification.Kind == NotificationKind.OnError)
+                .ObserveOn(SynchronizationContext.Current)
+                .Subscribe(_ => OnSubmitError()));
         }
 
         protected void InitializeExistingItems(IObservable<T> itemStream)
@@ -71,5 +107,11 @@ namespace BabyBrother.ViewModels
         }
 
         public abstract void SelectExistingItem(T item);
+
+        protected abstract IObservable<Unit> OnSubmit();
+
+        protected abstract void OnSubmitError();
+
+        protected abstract IObservable<bool> IsReadyToSubmit();
     }
 }
