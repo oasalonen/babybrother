@@ -21,11 +21,6 @@ namespace BabyBrother.ViewModels
             InitializeSubmit();
         }
 
-        public override void SelectExistingItem(Infant item)
-        {
-            throw new NotImplementedException();
-        }
-
         protected override IObservable<Unit> OnSubmit()
         {
             throw new NotImplementedException();

@@ -19,7 +19,6 @@ namespace BabyBrother.ViewModels
             Complete
         }
 
-        private readonly ISubject<User> _userSelectionStream;
         private readonly IBackendService _backendService;
         private readonly INotificationService _notificationService;
         private readonly IResourceService _resourceService;
@@ -33,7 +32,6 @@ namespace BabyBrother.ViewModels
             _backendService = backendService;
             _notificationService = notificationService;
             _resourceService = resourceService;
-            _userSelectionStream = new BehaviorSubject<User>(null);
             
             NewUsername = new ReactiveProperty<string>();
             AddSubscription(NewUsername);
@@ -48,21 +46,11 @@ namespace BabyBrother.ViewModels
             InitializeSubmit();
         }
 
-        public override void SelectExistingItem(User user)
-        {
-            _userSelectionStream.OnNext(user);
-        }
-
         protected override IObservable<bool> IsReadyToSubmit()
         {
-            var isExistingUserSelectedStream = _userSelectionStream
-                .Select(user => user != null)
-                .CombineLatest(CurrentState, (isUserSelected, state) => isUserSelected && state == SetByState.Existing);
-            var isNewUsernameSetStream = NewUsername
+            var canSubmitStream = NewUsername
                 .Select(name => !string.IsNullOrWhiteSpace(name))
                 .CombineLatest(CurrentState, (isNameSet, state) => isNameSet && state == SetByState.New);
-            var canSubmitStream = isExistingUserSelectedStream
-                .CombineLatest(isNewUsernameSetStream, (isNameSet, isUserSelected) => isNameSet || isUserSelected);
             
             return canSubmitStream;
         }

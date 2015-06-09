@@ -22,6 +22,7 @@ namespace BabyBrother.ViewModels
     public abstract class SetItemViewModel<T> : ViewModel 
         where T : class
     {
+        private readonly ISubject<T> _itemSelectionStream;
         private readonly ISubject<IObservable<Notification<Unit>>> _submitStream;
         protected readonly IObservable<Notification<Unit>> _submitStatusStream;
 
@@ -43,6 +44,7 @@ namespace BabyBrother.ViewModels
         {
             _submitStream = new Subject<IObservable<Notification<Unit>>>();
             _submitStatusStream = _submitStream.Switch();
+            _itemSelectionStream = new BehaviorSubject<T>(null);
 
             // State switching setup
             var setUserByNew = new ReactiveCommand();
@@ -69,7 +71,11 @@ namespace BabyBrother.ViewModels
                 .ToReactiveProperty(false);
             AddSubscription(IsSubmitting);
 
-            var canSubmitStream = IsReadyToSubmit()
+            var isExistingUserSelectedStream = _itemSelectionStream
+                .Select(item => item != null)
+                .CombineLatest(CurrentState, (isItemSelected, state) => isItemSelected && state == SetByState.Existing);
+            var canSubmitStream = isExistingUserSelectedStream
+                .CombineLatest(IsReadyToSubmit(), (isItemSelected, isReadyToSubmit) => isItemSelected || isReadyToSubmit)
                 .CombineLatest(IsSubmitting, (isReadyToSubmit, isSubmitting) => isReadyToSubmit && !isSubmitting);
             var submitCommand = new ReactiveCommand(canSubmitStream);
             AddSubscription(submitCommand.Subscribe(_ => 
@@ -107,7 +113,10 @@ namespace BabyBrother.ViewModels
             AddSubscription(ExistingItemsLoadState);
         }
 
-        public abstract void SelectExistingItem(T item);
+        public void SelectExistingItem(T item)
+        {
+            _itemSelectionStream.OnNext(item);
+        }
 
         protected abstract IObservable<Unit> OnSubmit();
 
