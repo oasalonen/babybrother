@@ -23,6 +23,7 @@ namespace BabyBrother.ViewModels
         where T : class
     {
         private readonly ISubject<IObservable<Notification<Unit>>> _submitStream;
+        protected readonly IObservable<Notification<Unit>> _submitStatusStream;
 
         public ReactiveProperty<SetByState> CurrentState { get; private set; }
 
@@ -40,7 +41,8 @@ namespace BabyBrother.ViewModels
 
         public SetItemViewModel()
         {
-            _submitStream = new BehaviorSubject<IObservable<Notification<Unit>>>(Observable.Empty<Unit>().Materialize());
+            _submitStream = new Subject<IObservable<Notification<Unit>>>();
+            _submitStatusStream = _submitStream.Switch();
 
             // State switching setup
             var setUserByNew = new ReactiveCommand();
@@ -61,11 +63,10 @@ namespace BabyBrother.ViewModels
         protected void InitializeSubmit()
         {
             // Submit setup
-            var latestSubmitStream = _submitStream.Switch();
             IsSubmitting = _submitStream.Select(_ => true)
-                .Merge(latestSubmitStream.Select(notification => notification.Kind == NotificationKind.OnNext))
+                .Merge(_submitStatusStream.Select(notification => notification.Kind == NotificationKind.OnNext))
                 .Catch(Observable.Empty<bool>())
-                .ToReactiveProperty();
+                .ToReactiveProperty(false);
             AddSubscription(IsSubmitting);
 
             var canSubmitStream = IsReadyToSubmit()
@@ -79,7 +80,7 @@ namespace BabyBrother.ViewModels
             }));
             SubmitCommand = submitCommand;
 
-            AddSubscription(latestSubmitStream
+            AddSubscription(_submitStatusStream
                 .Where(notification => notification.Kind == NotificationKind.OnError)
                 .ObserveOn(SynchronizationContext.Current)
                 .Subscribe(_ => OnSubmitError()));

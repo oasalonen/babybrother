@@ -45,12 +45,22 @@ namespace BabyBrother.Pages
                     NewUserSection.CurrentState = (state == SetByState.New ? ExpandingControl.State.Expanded : ExpandingControl.State.Collapsed);
                     ExistingUserSection.CurrentState = (state == SetByState.Existing ? ExpandingControl.State.Expanded : ExpandingControl.State.Collapsed);
                 }));
+
             _subscriptions.Add(_viewModel.IsSubmitting
                 .ObserveOn(SynchronizationContext.Current)
                 .Subscribe(isSubmitting =>
                 {
                     VisualStateManager.GoToState(this, isSubmitting ? "Submitting" : "NotSubmitting", false);
                 }));
+
+            _subscriptions.Add(_viewModel.ActionStream
+                .Where(a => a == SetUserPageViewModel.RequestedAction.Complete)
+                .ObserveOn(SynchronizationContext.Current)
+                .Subscribe(_ => 
+                {
+                    Frame.Navigate(typeof(SetInfantPage));
+                }));
+
             _subscriptions.Add(_viewModel);
         }
 

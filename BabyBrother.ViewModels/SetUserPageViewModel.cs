@@ -14,12 +14,19 @@ namespace BabyBrother.ViewModels
 {
     public class SetUserPageViewModel : SetItemViewModel<User>
     {
+        public enum RequestedAction
+        {
+            Complete
+        }
+
         private readonly ISubject<User> _userSelectionStream;
         private readonly IBackendService _backendService;
         private readonly INotificationService _notificationService;
         private readonly IResourceService _resourceService;
 
         public ReactiveProperty<string> NewUsername { get; private set; }
+
+        public IObservable<RequestedAction> ActionStream { get; private set; }
 
         public SetUserPageViewModel(IBackendService backendService, INotificationService notificationService, IResourceService resourceService)
         {
@@ -30,6 +37,12 @@ namespace BabyBrother.ViewModels
             
             NewUsername = new ReactiveProperty<string>();
             AddSubscription(NewUsername);
+
+            ActionStream = new Subject<RequestedAction>();
+
+            ActionStream = _submitStatusStream
+                .Where(notification => notification.Kind == NotificationKind.OnCompleted)
+                .Select(_ => RequestedAction.Complete);
 
             InitializeExistingItems(_backendService.GetUsers());
             InitializeSubmit();

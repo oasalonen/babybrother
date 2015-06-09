@@ -237,6 +237,41 @@ namespace BabyBrother.UnitTest
             }
         }
 
+        [TestMethod]
+        public async Task TestSuccessfulSubmitRequestsCompleteAction()
+        {
+            Mock.Arrange(() => _backendService.AddUser(Arg.IsAny<User>()))
+                .Returns(() => Observable.Return(Unit.Default));
+
+            _viewModel.NewUsername.Value = "name";
+            await _viewModel.ActionStream.AssertNextValueIs(SetUserPageViewModel.RequestedAction.Complete,
+                () => _viewModel.SubmitCommand.Execute(null));
+        }
+
+        // TODO: this fails because Mock.Assert needs to be spin-delayed
+        //[TestMethod]
+        //public void TestFailedSubmitShowsError()
+        //{
+        //    Mock.Arrange(() => _backendService.AddUser(Arg.IsAny<User>()))
+        //        .Returns(() => Observable.Throw<Unit>(new Exception()));
+        //    Mock.Arrange(() => _notificationService.ShowBlockingMessageAsync(Arg.IsAny<string>(), Arg.IsAny<string>()))
+        //        .OccursOnce();
+
+        //    _viewModel.NewUsername.Value = "name";
+        //    _viewModel.SubmitCommand.Execute(null);
+        //    Mock.Assert(_notificationService);
+        //}
+
+        [TestMethod]
+        public async Task TestSubmittingWithExistingUserRequestsCompleteAction()
+        {
+            _viewModel.SetByExistingCommand.Execute(null);
+            _viewModel.SelectExistingItem(new User());
+
+            await _viewModel.ActionStream.AssertNextValueIs(SetUserPageViewModel.RequestedAction.Complete,
+                () => _viewModel.SubmitCommand.Execute(null));
+        }
+
         private SetUserPageViewModel CreateViewModel()
         {
             return new SetUserPageViewModel(_backendService, _notificationService, _resourceService);
