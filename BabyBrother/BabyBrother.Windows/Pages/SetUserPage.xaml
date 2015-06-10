@@ -33,7 +33,7 @@
             
             <TextBlock 
                 x:Uid="SetUserPageTitle" 
-                Style="{StaticResource TitleTextBlock}"
+                Style="{StaticResource TitleTextStyle}"
                 />
 
             <StackPanel Grid.Row="1">

@@ -43,6 +43,15 @@ namespace BabyBrother.Pages
                     NewInfantSection.CurrentState = (state == SetByState.New ? ExpandingControl.State.Expanded : ExpandingControl.State.Collapsed);
                     ExistingInfantSection.CurrentState = (state == SetByState.Existing ? ExpandingControl.State.Expanded : ExpandingControl.State.Collapsed);
                 }));
+
+            _subscriptions.Add(_viewModel.ActionStream
+                .Where(a => a == SetInfantPageViewModel.RequestedAction.Complete)
+                .ObserveOn(SynchronizationContext.Current)
+                .Subscribe(_ =>
+                {
+                    Frame.Navigate(typeof(MainPage));
+                }));
+
             _subscriptions.Add(_viewModel);
         }
 

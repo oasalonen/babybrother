@@ -30,7 +30,7 @@
 
             <TextBlock 
                 x:Uid="SetInfantPageTitle" 
-                Style="{StaticResource TitleTextBlock}"
+                Style="{StaticResource TitleTextStyle}"
                 />
 
             <StackPanel Grid.Row="1">

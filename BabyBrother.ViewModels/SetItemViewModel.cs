@@ -22,6 +22,11 @@ namespace BabyBrother.ViewModels
     public abstract class SetItemViewModel<T> : ViewModel 
         where T : class
     {
+        public enum RequestedAction
+        {
+            Complete
+        }
+
         private readonly ISubject<T> _itemSelectionStream;
         private readonly ISubject<IObservable<Notification<Unit>>> _submitStream;
         protected readonly IObservable<Notification<Unit>> _submitStatusStream;
@@ -33,6 +38,8 @@ namespace BabyBrother.ViewModels
         public ReactiveProperty<LoadState> ExistingItemsLoadState { get; private set; }
 
         public ReactiveProperty<bool> IsSubmitting { get; private set; }
+
+        public IObservable<RequestedAction> ActionStream { get; private set; }
 
         public ICommand SetByNewCommand { get; private set; }
 
@@ -60,6 +67,10 @@ namespace BabyBrother.ViewModels
                 .Merge(setByExistingStream)
                 .ToReactiveProperty(SetByState.New);
             AddSubscription(CurrentState);
+
+            ActionStream = _submitStatusStream
+                .Where(notification => notification.Kind == NotificationKind.OnCompleted)
+                .Select(_ => RequestedAction.Complete);
         }
 
         protected void InitializeSubmit()

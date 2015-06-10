@@ -1,0 +1,87 @@
+﻿<Page
+    x:Class="BabyBrother.Pages.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BabyBrother"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid x:Name="RootGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.Resources>
+        </Grid.Resources>
+        
+        <Image 
+            Source="/Assets/hand.png" 
+            Width="{StaticResource MaxPageWidth}"
+            Stretch="UniformToFill"/>
+
+        <Grid 
+            MaxWidth="{StaticResource MaxPageWidth}"
+            VerticalAlignment="Bottom">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.Transitions>
+                <TransitionCollection>
+                    <PaneThemeTransition Edge="Bottom" />
+                </TransitionCollection>
+            </Grid.Transitions>
+            
+            <Border 
+                BorderThickness="0" 
+                Background="#DF000000"
+                Margin="0,0,0,-1">
+                <TextBlock
+                    Text="Hello user!"
+                    Style="{StaticResource TitleTextStyle}"
+                    Margin="20"
+                    />
+            </Border>
+            
+            <Grid 
+                Grid.Row="1"
+                Background="#CC000000"
+                HorizontalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <local:GridButton
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    HorizontalAlignment="Center"
+                    Image="/Assets/babybottle.png"
+                    Text="feed baby"
+                    />
+                <local:GridButton
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    Image="/Assets/diaper.png"
+                    Text="diaper change"
+                    />
+                <local:GridButton
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    HorizontalAlignment="Center"
+                    Image="/Assets/sleepzzzz.png"
+                    Text="nap time"
+                    />
+                <local:GridButton
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    Image="/Assets/ruler.png"
+                    Text="new measurement"
+                    />
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>
