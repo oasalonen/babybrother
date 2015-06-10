@@ -29,7 +29,7 @@
             <TextBlock
                 Grid.Row="1"
                 x:Name="ButtonText"
-                Style="{StaticResource SubheaderTextBlock}"
+                Style="{StaticResource SubheaderTextStyle}"
                 Text="feed baby"
                 HorizontalAlignment="Center"
                 Margin="0,0,0,50"

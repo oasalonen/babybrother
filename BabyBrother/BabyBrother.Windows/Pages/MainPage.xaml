@@ -54,32 +54,32 @@
                 </Grid.ColumnDefinitions>
                 
                 <local:GridButton
+                    x:Uid="MainPageFeedBabyButton"
                     Grid.Row="0"
                     Grid.Column="0"
                     HorizontalAlignment="Center"
                     Image="/Assets/babybottle.png"
-                    Text="feed baby"
                     />
                 <local:GridButton
+                    x:Uid="MainPageDiaperButton"
                     Grid.Row="0"
                     Grid.Column="1"
                     HorizontalAlignment="Center"
                     Image="/Assets/diaper.png"
-                    Text="diaper change"
                     />
                 <local:GridButton
+                    x:Uid="MainPageSleepButton"
                     Grid.Row="1"
                     Grid.Column="0"
                     HorizontalAlignment="Center"
                     Image="/Assets/sleepzzzz.png"
-                    Text="nap time"
                     />
                 <local:GridButton
+                    x:Uid="MainPageMeasureButton"
                     Grid.Row="1"
                     Grid.Column="1"
                     HorizontalAlignment="Center"
                     Image="/Assets/ruler.png"
-                    Text="new measurement"
                     />
             </Grid>
         </Grid>

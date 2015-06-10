@@ -126,6 +126,18 @@
   <data name="GenderOther" xml:space="preserve">
     <value>other</value>
   </data>
+  <data name="MainPageDiaperButton.Text" xml:space="preserve">
+    <value>change diaper</value>
+  </data>
+  <data name="MainPageFeedBabyButton.Text" xml:space="preserve">
+    <value>feed baby</value>
+  </data>
+  <data name="MainPageMeasureButton.Text" xml:space="preserve">
+    <value>new measurement</value>
+  </data>
+  <data name="MainPageSleepButton.Text" xml:space="preserve">
+    <value>nap time</value>
+  </data>
   <data name="NextButton.Content" xml:space="preserve">
     <value>Next</value>
   </data>
