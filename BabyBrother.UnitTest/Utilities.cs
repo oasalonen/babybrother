@@ -10,26 +10,69 @@ namespace BabyBrother.UnitTest
 {
     internal static class Utilities
     {
-        public static async Task AssertEqualsAsync<T>(T expected, Func<T> actual, TimeSpan? timeout = null)
+        public static Task AssertEqualsAsync<T>(T expected, Func<T> actual, TimeSpan? timeout = null)
+        {
+            T lastValue = default(T);
+
+            return AssertAsync(() =>
+            {
+                lastValue = actual();
+                return expected.Equals(lastValue);
+            },
+            () => 
+            {
+                Assert.AreEqual(expected, lastValue);
+            }, timeout);
+        }
+
+        public static Task AssertIsApproximateTimeAsync(DateTimeOffset expected, Func<DateTimeOffset> actual, TimeSpan? delta = null, TimeSpan? timeout = null)
+        {
+            if (delta == null)
+            {
+                delta = TimeSpan.FromSeconds(10);
+            }
+            var lastValue = DateTimeOffset.MinValue;
+
+            Func<DateTimeOffset, DateTimeOffset, bool> isApproximatelyEqual = (d1, d2) => 
+            {
+                var diff = d1 - d2;
+                if (diff.Ticks < 0)
+                {
+                    diff = diff.Negate();
+                }
+                return diff.CompareTo(delta.Value) <= 1;
+            };
+
+            return AssertAsync(() =>
+            {
+                lastValue = actual();
+                return isApproximatelyEqual(lastValue, expected);
+            },
+            () =>
+            {
+                var message = "DateTime equality mismatch. Expected time: " + expected.ToString() + ", Actual time: " + lastValue.ToString() + ", Max delta: " + delta.Value.ToString();
+                Assert.IsTrue(isApproximatelyEqual(lastValue, expected), message);
+            }, timeout);
+        }
+
+        private static async Task AssertAsync(Func<bool> stopCondition, Action assert, TimeSpan? timeout = null)
         {
             if (timeout == null)
             {
                 timeout = TimeSpan.FromSeconds(5);
             }
 
-            T lastValue = default(T);
             var stopwatch = Stopwatch.StartNew();
             do
             {
-                lastValue = actual();
-                if (expected.Equals(lastValue))
+                if (stopCondition())
                 {
                     break;
                 }
                 await Task.Delay(10);
             }
             while (stopwatch.Elapsed < timeout.Value);
-            Assert.AreEqual(expected, lastValue);
+            assert();
         }
 
         public static Task AssertNextValueIs<T>(this IObservable<T> source, T expected)
