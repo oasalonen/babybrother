@@ -1,7 +1,9 @@
-﻿using System;
+﻿using BabyBrother.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -22,9 +24,22 @@ namespace BabyBrother.Pages
     /// </summary>
     public sealed partial class FeedPage : Page
     {
+        private FeedPageViewModel _viewModel;
+        private CompositeDisposable _subscriptions;
+
         public FeedPage()
         {
+            DataContext = _viewModel = App.Container.GetInstance<FeedPageViewModel>();
             this.InitializeComponent();
+
+            _subscriptions = new CompositeDisposable();
+            _subscriptions.Add(_viewModel);
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            _subscriptions.Dispose();
+            base.OnNavigatedFrom(e);
         }
     }
 }

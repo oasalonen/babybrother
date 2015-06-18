@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="Common\LoadState.cs" />
     <Compile Include="FeedPageViewModel.cs" />
+    <Compile Include="MainPageViewModel.cs" />
     <Compile Include="SetInfantPageViewModel.cs" />
     <Compile Include="SetUserPageViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

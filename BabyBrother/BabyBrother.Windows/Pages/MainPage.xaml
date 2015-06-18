@@ -59,6 +59,7 @@
                     Grid.Column="0"
                     HorizontalAlignment="Center"
                     Image="/Assets/babybottle.png"
+                    Command="{Binding Feed}"
                     />
                 <local:GridButton
                     x:Uid="MainPageDiaperButton"

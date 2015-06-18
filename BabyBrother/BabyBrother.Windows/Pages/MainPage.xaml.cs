@@ -1,8 +1,12 @@
-﻿using System;
+﻿using BabyBrother.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -22,9 +26,37 @@ namespace BabyBrother.Pages
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private MainPageViewModel _viewModel;
+        private CompositeDisposable _subscriptions;
+
         public MainPage()
         {
+            DataContext = _viewModel = App.Container.GetInstance<MainPageViewModel>();
             this.InitializeComponent();
+
+            _subscriptions = new CompositeDisposable();
+
+            _subscriptions.Add(_viewModel.ActionStream
+                .ObserveOn(SynchronizationContext.Current)
+                .Subscribe(action =>
+                {
+                    switch (action)
+                    {
+                        case MainPageViewModel.RequestedAction.GoFeed:
+                            Frame.Navigate(typeof(FeedPage));
+                            break;
+                        default:
+                            break;
+                    }
+                }));
+
+            _subscriptions.Add(_viewModel);
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            _subscriptions.Dispose();
+            base.OnNavigatedFrom(e);
         }
     }
 }

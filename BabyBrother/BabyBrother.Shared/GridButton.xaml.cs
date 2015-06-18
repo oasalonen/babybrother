@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Windows.Input;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -19,6 +20,12 @@ namespace BabyBrother
 {
     public sealed partial class GridButton : UserControl
     {
+        public ICommand Command
+        {
+            get { return (ICommand)GetValue(CommandProperty); }
+            set { SetValue(CommandProperty, value); }
+        }
+
         public ImageSource Image
         {
             get { return (ImageSource)GetValue(ImageProperty); }
@@ -31,6 +38,9 @@ namespace BabyBrother
             set { SetValue(TextProperty, value); }
         }
 
+        private static readonly DependencyProperty CommandProperty = DependencyProperty.Register("Command", typeof(ICommand), typeof(GridButton),
+            new PropertyMetadata(null, OnCommandPropertyChanged));
+
         private static readonly DependencyProperty ImageProperty = DependencyProperty.Register("Image", typeof(ImageSource), typeof(GridButton),
             new PropertyMetadata(null, OnImagePropertyChanged));
 
@@ -40,6 +50,12 @@ namespace BabyBrother
         public GridButton()
         {
             this.InitializeComponent();
+        }
+
+        private static void OnCommandPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var self = d as GridButton;
+            self.RootButton.Command = e.NewValue as ICommand;
         }
 
         private static void OnImagePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

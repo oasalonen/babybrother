@@ -90,6 +90,24 @@ namespace BabyBrother.UnitTest
         }
 
         [TestMethod]
+        public async Task TestToggleBottleLeftSetsSourceToLeft()
+        {
+            _viewModel.ToggleBottle.Execute(null);
+            _viewModel.ToggleLeftBreast.Execute(null);
+            await _viewModel.Source.AssertNextValueIs(Feeding.Source.Left);
+            Assert.IsTrue(IsSourceSelectionsValid(_viewModel, Feeding.Source.Left));
+        }
+
+        [TestMethod]
+        public async Task TestToggleBottleRightSetsSourceToRight()
+        {
+            _viewModel.ToggleBottle.Execute(null);
+            _viewModel.ToggleRightBreast.Execute(null);
+            await _viewModel.Source.AssertNextValueIs(Feeding.Source.Right);
+            Assert.IsTrue(IsSourceSelectionsValid(_viewModel, Feeding.Source.Right));
+        }
+
+        [TestMethod]
         public async Task TestToggleBottleBottleSetsSourceToNone()
         {
             _viewModel.ToggleBottle.Execute(null);

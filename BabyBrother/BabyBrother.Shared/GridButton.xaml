@@ -13,6 +13,7 @@
     </UserControl.Resources>
     
     <Button 
+        x:Name="RootButton"
         BorderThickness="0">
         <Grid>
             <Grid.RowDefinitions>
