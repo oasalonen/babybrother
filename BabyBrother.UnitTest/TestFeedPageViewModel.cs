@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BabyBrother.UnitTest
@@ -17,6 +18,8 @@ namespace BabyBrother.UnitTest
         [TestInitialize]
         public void Initialize()
         {
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+
             _viewModel = new FeedPageViewModel();
         }
 
@@ -27,16 +30,18 @@ namespace BabyBrother.UnitTest
         }
 
         [TestMethod]
-        public void TestInitialSourceIsNone()
+        public async Task TestInitialSourceIsNone()
         {
-            Assert.AreEqual(Feeding.Source.None, _viewModel.Source.Value);
+            await _viewModel.Source.AssertNextValueIs(Feeding.Source.None);
+            Assert.IsTrue(IsSourceSelectionsValid(_viewModel, Feeding.Source.None));
         }
 
         [TestMethod]
         public async Task TestToggleLeftBreastSetsSourceToLeft()
         {
             _viewModel.ToggleLeftBreast.Execute(null);
-            await Utilities.AssertEqualsAsync(Feeding.Source.Left, () => _viewModel.Source.Value);
+            await _viewModel.Source.AssertNextValueIs(Feeding.Source.Left);
+            Assert.IsTrue(IsSourceSelectionsValid(_viewModel, Feeding.Source.Left));
         }
 
         [TestMethod]
@@ -44,14 +49,16 @@ namespace BabyBrother.UnitTest
         {
             _viewModel.ToggleLeftBreast.Execute(null);
             _viewModel.ToggleLeftBreast.Execute(null);
-            await Utilities.AssertEqualsAsync(Feeding.Source.None, () => _viewModel.Source.Value);
+            await _viewModel.Source.AssertNextValueIs(Feeding.Source.None);
+            Assert.IsTrue(IsSourceSelectionsValid(_viewModel, Feeding.Source.None));
         }
 
         [TestMethod]
         public async Task TestToggleRightBreastSetsSourceToRight()
         {
             _viewModel.ToggleRightBreast.Execute(null);
-            await Utilities.AssertEqualsAsync(Feeding.Source.Right, () => _viewModel.Source.Value);
+            await _viewModel.Source.AssertNextValueIs(Feeding.Source.Right);
+            Assert.IsTrue(IsSourceSelectionsValid(_viewModel, Feeding.Source.Right));
         }
 
         [TestMethod]
@@ -59,7 +66,8 @@ namespace BabyBrother.UnitTest
         {
             _viewModel.ToggleRightBreast.Execute(null);
             _viewModel.ToggleRightBreast.Execute(null);
-            await Utilities.AssertEqualsAsync(Feeding.Source.None, () => _viewModel.Source.Value);
+            await _viewModel.Source.AssertNextValueIs(Feeding.Source.None);
+            Assert.IsTrue(IsSourceSelectionsValid(_viewModel, Feeding.Source.None));
         }
 
         [TestMethod]
@@ -67,7 +75,8 @@ namespace BabyBrother.UnitTest
         {
             _viewModel.ToggleLeftBreast.Execute(null);
             _viewModel.ToggleRightBreast.Execute(null);
-            await Utilities.AssertEqualsAsync(Feeding.Source.LeftRight, () => _viewModel.Source.Value);
+            await _viewModel.Source.AssertNextValueIs(Feeding.Source.LeftRight);
+            Assert.IsTrue(IsSourceSelectionsValid(_viewModel, Feeding.Source.LeftRight));
         }
 
         [TestMethod]
@@ -76,25 +85,8 @@ namespace BabyBrother.UnitTest
             _viewModel.ToggleRightBreast.Execute(null);
             _viewModel.ToggleLeftBreast.Execute(null);
             _viewModel.ToggleRightBreast.Execute(null);
-            await Utilities.AssertEqualsAsync(Feeding.Source.Left, () => _viewModel.Source.Value);
-        }
-
-        [TestMethod]
-        public async Task TestToggleBottleSetsSourceToBottle()
-        {
-            _viewModel.ToggleBottle.Execute(null);
-            await Utilities.AssertEqualsAsync(Feeding.Source.Bottle, () => _viewModel.Source.Value);
-
-            _viewModel.ToggleBottle.Execute(null);
-            await Utilities.AssertEqualsAsync(Feeding.Source.None, () => _viewModel.Source.Value);
-
-            _viewModel.ToggleLeftBreast.Execute(null);
-            _viewModel.ToggleBottle.Execute(null);
-            await Utilities.AssertEqualsAsync(Feeding.Source.Bottle, () => _viewModel.Source.Value);
-
-            _viewModel.ToggleLeftBreast.Execute(null);
-            _viewModel.ToggleBottle.Execute(null);
-            await Utilities.AssertEqualsAsync(Feeding.Source.Bottle, () => _viewModel.Source.Value);
+            await _viewModel.Source.AssertNextValueIs(Feeding.Source.Left);
+            Assert.IsTrue(IsSourceSelectionsValid(_viewModel, Feeding.Source.Left));
         }
 
         [TestMethod]
@@ -102,7 +94,8 @@ namespace BabyBrother.UnitTest
         {
             _viewModel.ToggleBottle.Execute(null);
             _viewModel.ToggleBottle.Execute(null);
-            await Utilities.AssertEqualsAsync(Feeding.Source.None, () => _viewModel.Source.Value);
+            await _viewModel.Source.AssertNextValueIs(Feeding.Source.None);
+            Assert.IsTrue(IsSourceSelectionsValid(_viewModel, Feeding.Source.None));
         }
 
         [TestMethod]
@@ -110,7 +103,8 @@ namespace BabyBrother.UnitTest
         {
             _viewModel.ToggleLeftBreast.Execute(null);
             _viewModel.ToggleBottle.Execute(null);
-            await Utilities.AssertEqualsAsync(Feeding.Source.Bottle, () => _viewModel.Source.Value);
+            await _viewModel.Source.AssertNextValueIs(Feeding.Source.Bottle);
+            Assert.IsTrue(IsSourceSelectionsValid(_viewModel, Feeding.Source.Bottle));
         }
 
         [TestMethod]
@@ -118,7 +112,8 @@ namespace BabyBrother.UnitTest
         {
             _viewModel.ToggleRightBreast.Execute(null);
             _viewModel.ToggleBottle.Execute(null);
-            await Utilities.AssertEqualsAsync(Feeding.Source.Bottle, () => _viewModel.Source.Value);
+            await _viewModel.Source.AssertNextValueIs(Feeding.Source.Bottle);
+            Assert.IsTrue(IsSourceSelectionsValid(_viewModel, Feeding.Source.Bottle));
         }
 
         [TestMethod]
@@ -127,7 +122,8 @@ namespace BabyBrother.UnitTest
             _viewModel.ToggleLeftBreast.Execute(null);
             _viewModel.ToggleRightBreast.Execute(null);
             _viewModel.ToggleBottle.Execute(null);
-            await Utilities.AssertEqualsAsync(Feeding.Source.Bottle, () => _viewModel.Source.Value);
+            await _viewModel.Source.AssertNextValueIs(Feeding.Source.Bottle);
+            Assert.IsTrue(IsSourceSelectionsValid(_viewModel, Feeding.Source.Bottle));
         }
 
         [TestMethod]
@@ -138,16 +134,23 @@ namespace BabyBrother.UnitTest
         }
 
         [TestMethod]
+        public void TestCannotStartIfStartTimeSet()
+        {
+            _viewModel.StartTime.Value = DateTimeOffset.Now;
+            Assert.IsFalse(_viewModel.Start.CanExecute(null));
+        }
+
+        [TestMethod]
         public void TestCannotStopIfStartTimeNotSet()
         {
             Assert.IsFalse(_viewModel.Stop.CanExecute(null));
         }
 
         [TestMethod]
-        public void TestCanStopIfStartTimeSet()
+        public async Task TestCanStopIfStartTimeSet()
         {
             _viewModel.StartTime.Value = DateTimeOffset.Now;
-            Assert.IsTrue(_viewModel.Stop.CanExecute(null));
+            await Utilities.AssertEqualsAsync(true, () => _viewModel.Stop.CanExecute(null));
         }
 
         [TestMethod]
@@ -156,6 +159,25 @@ namespace BabyBrother.UnitTest
             _viewModel.StartTime.Value = DateTimeOffset.Now - TimeSpan.FromHours(1);
             _viewModel.Stop.Execute(null);
             await Utilities.AssertIsApproximateTimeAsync(DateTimeOffset.Now, () => _viewModel.StopTime.Value);
+        }
+
+        public bool IsSourceSelectionsValid(FeedPageViewModel viewModel, Feeding.Source source)
+        {
+            switch (source)
+            {
+                case Feeding.Source.None:
+                    return !viewModel.IsBottleSelected.Value && !viewModel.IsLeftBreastSelected.Value && !viewModel.IsRightBreastSelected.Value;
+                case Feeding.Source.Bottle:
+                    return viewModel.IsBottleSelected.Value && !viewModel.IsLeftBreastSelected.Value && !viewModel.IsRightBreastSelected.Value;
+                case Feeding.Source.LeftRight:
+                    return !viewModel.IsBottleSelected.Value && viewModel.IsLeftBreastSelected.Value && viewModel.IsRightBreastSelected.Value;
+                case Feeding.Source.Left:
+                    return !viewModel.IsBottleSelected.Value && viewModel.IsLeftBreastSelected.Value && !viewModel.IsRightBreastSelected.Value;
+                case Feeding.Source.Right:
+                    return !viewModel.IsBottleSelected.Value && !viewModel.IsLeftBreastSelected.Value && viewModel.IsRightBreastSelected.Value;
+                default:
+                    return false;
+            }
         }
     }
 }
