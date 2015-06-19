@@ -92,8 +92,22 @@ namespace BabyBrother.ViewModels
             AddSubscription(toggleLeft);
             AddSubscription(toggleBottle);
 
-            AddSubscription(toggleRight.Subscribe(_ => IsRightBreastSelected.Value = !IsRightBreastSelected.Value));
-            AddSubscription(toggleLeft.Subscribe(_ => IsLeftBreastSelected.Value = !IsLeftBreastSelected.Value));
+            AddSubscription(toggleRight.Subscribe(_ =>
+            {
+                IsRightBreastSelected.Value = !IsRightBreastSelected.Value;
+                if (IsRightBreastSelected.Value)
+                {
+                    IsBottleSelected.Value = false;
+                }
+            }));
+            AddSubscription(toggleLeft.Subscribe(_ =>
+            {
+                IsLeftBreastSelected.Value = !IsLeftBreastSelected.Value;
+                if (IsLeftBreastSelected.Value)
+                {
+                    IsBottleSelected.Value = false;
+                }
+            }));
             AddSubscription(toggleBottle.Subscribe(_ => 
             {
                 IsBottleSelected.Value = !IsBottleSelected.Value;

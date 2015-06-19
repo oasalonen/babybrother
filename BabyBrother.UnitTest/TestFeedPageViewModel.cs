@@ -159,9 +159,9 @@ namespace BabyBrother.UnitTest
         }
 
         [TestMethod]
-        public void TestCannotStopIfStartTimeNotSet()
+        public async Task TestCannotStopIfStartTimeNotSet()
         {
-            Assert.IsFalse(_viewModel.Stop.CanExecute(null));
+            await Utilities.AssertEqualsAsync(false, () => _viewModel.Stop.CanExecute(null));
         }
 
         [TestMethod]
