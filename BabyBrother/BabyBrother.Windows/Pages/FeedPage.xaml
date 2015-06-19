@@ -11,11 +11,14 @@
         <Grid.Resources>
         </Grid.Resources>
 
-        <Grid MaxWidth="{StaticResource MaxPageWidth}"
-              Margin="{StaticResource PageMargin}">
+        <Grid 
+            MaxWidth="{StaticResource MaxPageWidth}"
+            Margin="{StaticResource PageMargin}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             
@@ -27,7 +30,8 @@
             
             <StackPanel 
                 Grid.Row="1"
-                Orientation="Horizontal">
+                Orientation="Horizontal"
+                Margin="0,0,0,20">
                 <local:ImageToggle
                     Image="/Assets/breast.png"
                     ImageSelected="/Assets/breast-selected.png"
@@ -41,7 +45,7 @@
                     Image="/Assets/breast.png"
                     ImageSelected="/Assets/breast-selected.png"
                     IsImageFlipped="true"
-                    Text="left"
+                    Text="right"
                     Command="{Binding ToggleRightBreast}"
                     IsSelected="{Binding IsRightBreastSelected.Value}"
                     Width="120"
@@ -57,6 +61,92 @@
                     Margin="40,0,0,0"
                     />
             </StackPanel>
+            
+            <StackPanel
+                Grid.Row="2">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Style="{StaticResource SubheaderTextStyle}"
+                        Text="Started:"
+                        />
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Style="{StaticResource SubheaderTextStyle}"
+                        Text="Ended:"
+                        />
+                    <TextBlock
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Style="{StaticResource SubheaderTextStyle}"
+                        Text="Duration:"
+                        />
+
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Style="{StaticResource SubheaderTextStyle}"
+                        Text="00:00 am"
+                        Margin="20,0,0,0"
+                        />
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Style="{StaticResource SubheaderTextStyle}"
+                        Text="00:00 am"
+                        Margin="20,0,0,0"
+                        />
+                    <TextBlock
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Style="{StaticResource SubheaderTextStyle}"
+                        Text="00:00:00"
+                        Margin="20,0,0,0"
+                        />
+                </Grid>
+            </StackPanel>
+
+            <Grid 
+                Grid.Row="3"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <ProgressRing
+                    Grid.Row="0"
+                    IsActive="True"
+                    Width="100"
+                    Height="100"
+                    />
+                <TextBlock
+                    Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    Style="{StaticResource SubheaderTextStyle}"
+                    Text="00:00:00"
+                    />
+            </Grid>
+
+            <Button
+                Grid.Row="4"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Stretch"
+                Content="Stop"
+                />
         </Grid>
     </Grid>
 </Page>
