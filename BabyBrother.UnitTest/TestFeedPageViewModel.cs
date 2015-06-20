@@ -212,6 +212,16 @@ namespace BabyBrother.UnitTest
             await Utilities.AssertIsApproximateTimeAsync(expectedDuration, () => _viewModel.Duration.Value);
         }
 
+        [TestMethod]
+        public async Task TextOverrideDurationSetsStopTimeAndDuration()
+        {
+            _viewModel.StartTime.Value = DateTimeOffset.Now - TimeSpan.FromMinutes(1);
+            _viewModel.StopTime.Value = DateTimeOffset.Now;
+            _viewModel.OverrideDuration(TimeSpan.FromMinutes(2));
+            await Utilities.AssertIsApproximateTimeAsync(DateTimeOffset.Now + TimeSpan.FromMinutes(1), () => _viewModel.StopTime.Value);
+            Assert.AreEqual(TimeSpan.FromMinutes(2), _viewModel.Duration.Value);
+        }
+
         public bool IsSourceSelectionsValid(FeedPageViewModel viewModel, Feeding.Source source)
         {
             switch (source)

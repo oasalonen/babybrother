@@ -38,44 +38,55 @@
                 Text="feed baby"
                 Style="{StaticResource TitleTextStyle}"
                 />
-            
+
             <StackPanel 
                 Grid.Row="1"
-                Orientation="Horizontal"
                 Margin="0,0,0,20">
-                <local:ImageToggle
-                    Image="/Assets/breast.png"
-                    ImageSelected="/Assets/breast-selected.png"
-                    Text="left"
-                    Command="{Binding ToggleLeftBreast}"
-                    IsSelected="{Binding IsLeftBreastSelected.Value}"
-                    Width="120"
-                    />
-
-                <local:ImageToggle
-                    Image="/Assets/breast.png"
-                    ImageSelected="/Assets/breast-selected.png"
-                    IsImageFlipped="true"
-                    Text="right"
-                    Command="{Binding ToggleRightBreast}"
-                    IsSelected="{Binding IsRightBreastSelected.Value}"
-                    Width="120"
-                    />
-
-                <local:ImageToggle
-                    Image="/Assets/bottle-outline.png"
-                    ImageSelected="/Assets/bottle-outline-selected.png"
-                    Text="bottle"
-                    Command="{Binding ToggleBottle}"
-                    IsSelected="{Binding IsBottleSelected.Value}"
-                    Width="120"
-                    Margin="40,0,0,0"
-                    />
-            </StackPanel>
             
+                <local:SectionHeader
+                    Text="food source"
+                    />
+
+                <StackPanel Orientation="Horizontal">
+                    <local:ImageToggle
+                        Image="/Assets/breast.png"
+                        ImageSelected="/Assets/breast-selected.png"
+                        Text="left"
+                        Command="{Binding ToggleLeftBreast}"
+                        IsSelected="{Binding IsLeftBreastSelected.Value}"
+                        Width="120"
+                        />
+
+                    <local:ImageToggle
+                        Image="/Assets/breast.png"
+                        ImageSelected="/Assets/breast-selected.png"
+                        IsImageFlipped="true"
+                        Text="right"
+                        Command="{Binding ToggleRightBreast}"
+                        IsSelected="{Binding IsRightBreastSelected.Value}"
+                        Width="120"
+                        />
+
+                    <local:ImageToggle
+                        Image="/Assets/bottle-outline.png"
+                        ImageSelected="/Assets/bottle-outline-selected.png"
+                        Text="bottle"
+                        Command="{Binding ToggleBottle}"
+                        IsSelected="{Binding IsBottleSelected.Value}"
+                        Width="120"
+                        Margin="40,0,0,0"
+                        />
+                </StackPanel>
+            </StackPanel>
+
             <StackPanel
                 Grid.Row="2"
                 Visibility="{Binding IsRunning.Value, Converter={StaticResource InvertedVisibilityConverter}}">
+                <local:SectionHeader
+                    Text="time information"
+                    Margin="0,0,0,10"
+                    />
+                
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -91,20 +102,29 @@
                         Grid.Row="0"
                         Grid.Column="0"
                         Style="{StaticResource SubheaderTextStyle}"
-                        Text="Started:"
+                        Text="start"
+                        Margin="0,0,0,10"
                         />
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="0"
                         Style="{StaticResource SubheaderTextStyle}"
-                        Text="Ended:"
+                        Text="end"
+                        Margin="0,0,0,10"
                         />
-                    <TextBlock
+                    <StackPanel
                         Grid.Row="2"
-                        Grid.Column="0"
-                        Style="{StaticResource SubheaderTextStyle}"
-                        Text="Duration:"
-                        />
+                        Grid.Column="0">
+                        <TextBlock
+                            Style="{StaticResource SubheaderTextStyle}"
+                            Text="duration"
+                            />
+                        <TextBlock
+                            Style="{StaticResource TinyDetailTextStyle}"
+                            Text="(hh:mm)"
+                            />
+                    </StackPanel>
+
 
                     <TextBlock
                         Grid.Row="0"
@@ -120,12 +140,14 @@
                         Text="{Binding StopTime.Value, Converter={StaticResource TimeStringConverter}}"
                         Margin="20,0,0,0"
                         />
-                    <TextBlock
+                    <TimePicker
+                        x:Name="DurationPicker"
                         Grid.Row="2"
                         Grid.Column="1"
-                        Style="{StaticResource SubheaderTextStyle}"
-                        Text="{Binding Duration.Value, Converter={StaticResource TimeStringConverter}}"
+                        ClockIdentifier="24HourClock"
+                        Time="{Binding Duration.Value, Mode=OneWay}"
                         Margin="20,0,0,0"
+                        TimeChanged="OnDurationChanged"
                         />
                 </Grid>
             </StackPanel>

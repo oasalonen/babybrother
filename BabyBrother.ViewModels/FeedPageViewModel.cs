@@ -3,6 +3,7 @@ using BabyBrother.Models;
 using Reactive.Bindings;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
@@ -141,6 +142,14 @@ namespace BabyBrother.ViewModels
                     IsLeftBreastSelected.Value = false;
                 }
             }));
+        }
+
+        public void OverrideDuration(TimeSpan timeSpan)
+        {
+            if (TimeUtilities.IsValid(StartTime.Value) && TimeUtilities.IsValid(StopTime.Value))
+            {
+                StopTime.Value = StartTime.Value + timeSpan;
+            }
         }
     }
 }

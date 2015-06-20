@@ -41,5 +41,10 @@ namespace BabyBrother.Pages
             _subscriptions.Dispose();
             base.OnNavigatedFrom(e);
         }
+
+        private void OnDurationChanged(object sender, TimePickerValueChangedEventArgs e)
+        {
+            _viewModel.OverrideDuration(e.NewTime);
+        }
     }
 }

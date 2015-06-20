@@ -4,12 +4,21 @@
     xmlns:local="using:BabyBrother">
 
     <Color x:Key="SubtleForeground">#EDEDED</Color>
+    <SolidColorBrush 
+        x:Key="SubtleBrush"
+        Color="{StaticResource SubtleForeground}"
+        />
     
     <x:Double x:Key="TinyFontSize">12</x:Double>
     <x:Double x:Key="SubheaderFontSize">20</x:Double>
     <x:Double x:Key="TitleFontSize">24</x:Double>
     
     <Style x:Key="TinyHeaderTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource TinyFontSize}"/>
+        <Setter Property="Foreground" Value="{StaticResource SubtleForeground}"/>
+    </Style>
+
+    <Style x:Key="TinyDetailTextStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="{StaticResource TinyFontSize}"/>
         <Setter Property="Foreground" Value="{StaticResource SubtleForeground}"/>
     </Style>
