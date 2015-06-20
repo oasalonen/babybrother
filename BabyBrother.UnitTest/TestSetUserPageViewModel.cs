@@ -19,6 +19,7 @@ namespace BabyBrother.UnitTest
     public class TestSetUserPageViewModel
     {
         private SetUserPageViewModel _viewModel;
+        private AppState _appState;
         private IBackendService _backendService;
         private INotificationService _notificationService;
         private IResourceService _resourceService;
@@ -29,10 +30,11 @@ namespace BabyBrother.UnitTest
             // Needed if not manually passing IScheduler to ReactiveCommands?
             SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
 
+            _appState = new AppState();
             _backendService = Mock.Create<IBackendService>();
             _notificationService = Mock.Create<INotificationService>();
             _resourceService = Mock.Create<IResourceService>();
-            _viewModel = new SetUserPageViewModel(_backendService, _notificationService, _resourceService);
+            _viewModel = new SetUserPageViewModel(_appState, _backendService, _notificationService, _resourceService);
         }
 
         [TestCleanup]
@@ -78,7 +80,7 @@ namespace BabyBrother.UnitTest
 
             Mock.Arrange(() => _backendService.AddUser(Arg.IsAny<User>()))
                 .DoInstead<User>(u => calledUser = u)
-                .Returns(Observable.Empty<Unit>())
+                .Returns(Observable.Empty<User>())
                 .OccursOnce();
 
             _viewModel.NewUsername.Value = expectedName;
@@ -95,7 +97,7 @@ namespace BabyBrother.UnitTest
         public void TestSubmitCommandDoesNothingWhenSetByNewAndInvalidName(string name)
         {
             Mock.Arrange(() => _backendService.AddUser(Arg.IsAny<User>()))
-                .Returns(Observable.Empty<Unit>())
+                .Returns(Observable.Empty<User>())
                 .OccursNever();
 
             _viewModel.NewUsername.Value = name;
@@ -108,7 +110,7 @@ namespace BabyBrother.UnitTest
         public void TestSubmitCommandDoesNothingWhenSetByExisting()
         {
             Mock.Arrange(() => _backendService.AddUser(Arg.IsAny<User>()))
-                .Returns(Observable.Empty<Unit>())
+                .Returns(Observable.Empty<User>())
                 .OccursNever();
 
             _viewModel.NewUsername.Value = "name";
@@ -136,7 +138,7 @@ namespace BabyBrother.UnitTest
         {
             _viewModel.NewUsername.Value = "name";
             Mock.Arrange(() => _backendService.AddUser(Arg.IsAny<User>()))
-                .Returns(() => Observable.Never<Unit>());
+                .Returns(() => Observable.Never<User>());
 
             var expectedValues = new List<bool> { false, true };
             await _viewModel.IsSubmitting.AssertNextValueIs(expectedValues, () => _viewModel.SubmitCommand.Execute(null));
@@ -155,7 +157,7 @@ namespace BabyBrother.UnitTest
                 .Returns(() => users.ToObservable())
                 .OccursOnce();
 
-            var viewModel = new SetUserPageViewModel(backendService, _notificationService, _resourceService);
+            var viewModel = new SetUserPageViewModel(_appState, backendService, _notificationService, _resourceService);
             CollectionAssert.AreEquivalent(users, viewModel.ExistingItems);
             Mock.Assert(backendService);
         }
@@ -173,7 +175,7 @@ namespace BabyBrother.UnitTest
                 .Returns(() => users.ToObservable())
                 .MustBeCalled();
 
-            var viewModel = new SetUserPageViewModel(backendService, _notificationService, _resourceService);
+            var viewModel = new SetUserPageViewModel(_appState, backendService, _notificationService, _resourceService);
             await Utilities.AssertEqualsAsync(2, () => viewModel.ExistingItems.Count);
             Mock.Assert(backendService);
         }
@@ -185,7 +187,7 @@ namespace BabyBrother.UnitTest
             Mock.Arrange(() => backendService.GetUsers())
                 .Returns(() => Observable.Throw<User>(new Exception()));
 
-            var viewModel = new SetUserPageViewModel(backendService, _notificationService, _resourceService);
+            var viewModel = new SetUserPageViewModel(_appState, backendService, _notificationService, _resourceService);
             Assert.AreEqual(0, viewModel.ExistingItems.Count);
         }
 
@@ -241,7 +243,7 @@ namespace BabyBrother.UnitTest
         public async Task TestSuccessfulSubmitRequestsCompleteAction()
         {
             Mock.Arrange(() => _backendService.AddUser(Arg.IsAny<User>()))
-                .Returns(() => Observable.Return(Unit.Default));
+                .Returns(() => Observable.Return(new User()));
 
             _viewModel.NewUsername.Value = "name";
             await _viewModel.ActionStream.AssertNextValueIs(SetUserPageViewModel.RequestedAction.Complete,
@@ -272,9 +274,32 @@ namespace BabyBrother.UnitTest
                 () => _viewModel.SubmitCommand.Execute(null));
         }
 
+        [TestMethod]
+        public async Task TestAddingNewUserSetsAppStateCurrentUser()
+        {
+            var user = new User { Id = "id", Name = "name" };
+
+            Mock.Arrange(() => _backendService.AddUser(Arg.IsAny<User>()))
+                .Returns(() => Observable.Return(user));
+
+            _viewModel.NewUsername.Value = user.Name;
+            _viewModel.SubmitCommand.Execute(null);
+            await _appState.CurrentUserStream.AssertNextValueIs(user);
+        }
+
+        [TestMethod]
+        public async Task TestSetByExistingSetsAppStateCurrentUser()
+        {
+            var user = new User { Id = "id", Name = "name" };
+            _viewModel.SetByExistingCommand.Execute(null);
+            _viewModel.SelectExistingItem(user);
+            _viewModel.SubmitCommand.Execute(null);
+            await _appState.CurrentUserStream.AssertNextValueIs(user);
+        }
+
         private SetUserPageViewModel CreateViewModel()
         {
-            return new SetUserPageViewModel(_backendService, _notificationService, _resourceService);
+            return new SetUserPageViewModel(_appState, _backendService, _notificationService, _resourceService);
         }
     }
 }

@@ -21,6 +21,7 @@ namespace BabyBrother.ViewModels
             public Infant.GenderType Gender { get; set; }
         }
 
+        private readonly AppState _appState;
         private readonly IBackendService _backendService;
         private readonly INotificationService _notificationService;
         private readonly IResourceService _resourceService;
@@ -33,8 +34,9 @@ namespace BabyBrother.ViewModels
 
         public ICollection<GenderItem> AvailableGenders { get; private set; }
 
-        public SetInfantPageViewModel(IBackendService backendService, INotificationService notificationService, IResourceService resourceService)
+        public SetInfantPageViewModel(AppState appState, IBackendService backendService, INotificationService notificationService, IResourceService resourceService)
         {
+            _appState = appState;
             _backendService = backendService;
             _notificationService = notificationService;
             _resourceService = resourceService;
@@ -66,11 +68,16 @@ namespace BabyBrother.ViewModels
             Gender = new ReactiveProperty<GenderItem>();
             AddSubscription(Gender);
 
+            AddSubscription(_setItemStream.Subscribe(infant =>
+            {
+                _appState.SetCurrentInfant(infant);
+            }));
+
             InitializeExistingItems(_backendService.GetInfants());
             InitializeSubmit();
         }
 
-        protected override IObservable<Unit> OnSubmit()
+        protected override IObservable<Infant> OnSubmit()
         {
             var name = Name.Value;
             if (!string.IsNullOrWhiteSpace(name) && 
@@ -87,7 +94,7 @@ namespace BabyBrother.ViewModels
             }
             else
             {
-                return Observable.Empty<Unit>();
+                return Observable.Empty<Infant>();
             }
         }
 

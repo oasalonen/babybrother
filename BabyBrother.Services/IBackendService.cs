@@ -9,9 +9,9 @@ namespace BabyBrother.Services
 {
     public interface IBackendService
     {
-        IObservable<Unit> AddUser(User user);
+        IObservable<User> AddUser(User user);
 
-        IObservable<Unit> AddInfant(Infant infant);
+        IObservable<Infant> AddInfant(Infant infant);
 
         IObservable<User> GetUsers();
 

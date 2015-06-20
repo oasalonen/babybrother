@@ -11,14 +11,14 @@ namespace BabyBrother.Services.Implementations
 {
     public class MockBackendService : IBackendService
     {
-        public IObservable<Unit> AddUser(User user)
+        public IObservable<User> AddUser(User user)
         {
-            return Observable.Empty<Unit>().Delay(TimeSpan.FromSeconds(3));
+            return Observable.Empty<User>().Delay(TimeSpan.FromSeconds(3));
         }
 
-        public IObservable<Unit> AddInfant(Infant infant)
+        public IObservable<Infant> AddInfant(Infant infant)
         {
-            return Observable.Empty<Unit>().Delay(TimeSpan.FromSeconds(3));
+            return Observable.Empty<Infant>().Delay(TimeSpan.FromSeconds(3));
         }
 
         public IObservable<User> GetUsers()

@@ -27,14 +27,18 @@ namespace BabyBrother.Services.Implementations
             _infantTable = _service.GetTable<Infant>();
         }
 
-        public IObservable<Unit> AddUser(User user)
+        public IObservable<User> AddUser(User user)
         {
-            return _userTable.InsertAsync(user).ToObservable();
+            return _userTable.InsertAsync(user)
+                .ToObservable()
+                .Select(_ => user);
         }
 
-        public IObservable<Unit> AddInfant(Infant infant)
+        public IObservable<Infant> AddInfant(Infant infant)
         {
-            return _infantTable.InsertAsync(infant).ToObservable();
+            return _infantTable.InsertAsync(infant)
+                .ToObservable()
+                .Select(_ => infant);
         }
 
         public IObservable<User> GetUsers()

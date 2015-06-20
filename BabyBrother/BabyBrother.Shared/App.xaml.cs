@@ -1,4 +1,5 @@
-﻿using BabyBrother.Services;
+﻿using BabyBrother.Models;
+using BabyBrother.Services;
 using BabyBrother.Services.Implementations;
 using SimpleInjector;
 using System;
@@ -158,6 +159,7 @@ namespace BabyBrother
         {
             Container = new SimpleInjector.Container();
 
+            Container.RegisterSingle<AppState>();
             Container.RegisterSingle<IBackendService, AzureBackendService>();
             //Container.RegisterSingle<IBackendService, MockBackendService>();
             Container.RegisterSingle<INotificationService, WindowsNotificationService>();

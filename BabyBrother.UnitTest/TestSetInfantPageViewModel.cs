@@ -17,6 +17,7 @@ namespace BabyBrother.UnitTest
     [TestClass]
     public class TestSetInfantPageViewModel
     {
+        private AppState _appState;
         private IBackendService _backendService;
         private INotificationService _notificationService;
         private IResourceService _resourceLoader;
@@ -27,10 +28,11 @@ namespace BabyBrother.UnitTest
         {
             SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
 
+            _appState = new AppState();
             _backendService = Mock.Create<IBackendService>();
             _notificationService = Mock.Create<INotificationService>();
             _resourceLoader = Mock.Create<IResourceService>();
-            _viewModel = new SetInfantPageViewModel(_backendService, _notificationService, _resourceLoader);
+            _viewModel = new SetInfantPageViewModel(_appState, _backendService, _notificationService, _resourceLoader);
         }
 
         [TestCleanup]
@@ -45,7 +47,7 @@ namespace BabyBrother.UnitTest
             Infant infant = null;
             Mock.Arrange(() => _backendService.AddInfant(Arg.IsAny<Infant>()))
                 .DoInstead<Infant>(i => infant = i)
-                .Returns(Observable.Empty<Unit>())
+                .Returns(Observable.Empty<Infant>())
                 .OccursOnce();
 
             var expectedName = "name";
@@ -65,7 +67,7 @@ namespace BabyBrother.UnitTest
         public void TestSubmitDoesNotCallAddInfantWhenNotSetByNew()
         {
             Mock.Arrange(() => _backendService.AddInfant(Arg.IsAny<Infant>()))
-                .Returns(Observable.Empty<Unit>())
+                .Returns(Observable.Empty<Infant>())
                 .OccursNever();
 
             _viewModel.CurrentState.Value = SetByState.Existing;
@@ -81,7 +83,7 @@ namespace BabyBrother.UnitTest
         public void TestSubmitDoesNotCallAddInfantWhenNameNotSet()
         {
             Mock.Arrange(() => _backendService.AddInfant(Arg.IsAny<Infant>()))
-                .Returns(Observable.Empty<Unit>())
+                .Returns(Observable.Empty<Infant>())
                 .OccursNever();
 
             _viewModel.Name.Value = null;
@@ -96,7 +98,7 @@ namespace BabyBrother.UnitTest
         public void TestSubmitDoesNotCallAddInfantWhenGenderNotSet()
         {
             Mock.Arrange(() => _backendService.AddInfant(Arg.IsAny<Infant>()))
-                .Returns(Observable.Empty<Unit>())
+                .Returns(Observable.Empty<Infant>())
                 .OccursNever();
 
             _viewModel.Name.Value = "name";
@@ -112,7 +114,7 @@ namespace BabyBrother.UnitTest
         {
             bool isReady = false;
             Mock.Arrange(() => _backendService.AddInfant(Arg.IsAny<Infant>()))
-                .Returns(Observable.Throw<Unit>(new Exception()));
+                .Returns(Observable.Throw<Infant>(new Exception()));
             Mock.Arrange(() => _notificationService.ShowBlockingMessageAsync(Arg.IsAny<string>(), Arg.IsAny<string>()))
                 .DoInstead<string,string>((_, __) => isReady = true)
                 .Returns(Task.FromResult<object>(null))
@@ -135,12 +137,37 @@ namespace BabyBrother.UnitTest
                 .Returns(Observable.Return<Infant>(infant))
                 .OccursOnce();
 
-            using (var viewModel = new SetInfantPageViewModel(_backendService, _notificationService, _resourceLoader))
+            using (var viewModel = new SetInfantPageViewModel(_appState, _backendService, _notificationService, _resourceLoader))
             {
                 await Utilities.AssertEqualsAsync(1, () => viewModel.ExistingItems.Count);
                 CollectionAssert.AreEquivalent(new List<Infant> { infant }, viewModel.ExistingItems);
                 Mock.Assert(_backendService);
             }
+        }
+
+        [TestMethod]
+        public async Task TestAddingNewInfantSetsAppStateCurrentInfant()
+        {
+            var infant = new Infant { Id = "id", Name = "name" };
+
+            Mock.Arrange(() => _backendService.AddInfant(Arg.IsAny<Infant>()))
+                .Returns(() => Observable.Return(infant));
+
+            _viewModel.Name.Value = "name";
+            _viewModel.DateOfBirth.Value = DateTimeOffset.Now;
+            _viewModel.Gender.Value = new SetInfantPageViewModel.GenderItem { Gender = Infant.GenderType.Female };
+            _viewModel.SubmitCommand.Execute(null);
+            await _appState.CurrentInfantStream.AssertNextValueIs(infant);
+        }
+
+        [TestMethod]
+        public async Task TestSetByExistingSetsAppStateCurrentUser()
+        {
+            var infant = new Infant { Id = "id", Name = "name" };
+            _viewModel.SetByExistingCommand.Execute(null);
+            _viewModel.SelectExistingItem(infant);
+            _viewModel.SubmitCommand.Execute(null);
+            await _appState.CurrentInfantStream.AssertNextValueIs(infant);
         }
     }
 }

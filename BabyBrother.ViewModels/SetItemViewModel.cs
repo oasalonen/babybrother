@@ -28,8 +28,9 @@ namespace BabyBrother.ViewModels
         }
 
         private readonly ISubject<T> _itemSelectionStream;
-        private readonly ISubject<IObservable<Notification<Unit>>> _submitStream;
-        protected readonly IObservable<Notification<Unit>> _submitStatusStream;
+        private readonly ISubject<IObservable<Notification<T>>> _submitStream;
+        protected readonly IObservable<Notification<T>> _submitStatusStream;
+        protected readonly IObservable<T> _setItemStream;
 
         public ReactiveProperty<SetByState> CurrentState { get; private set; }
 
@@ -49,9 +50,15 @@ namespace BabyBrother.ViewModels
 
         public SetItemViewModel()
         {
-            _submitStream = new Subject<IObservable<Notification<Unit>>>();
+            _submitStream = new Subject<IObservable<Notification<T>>>();
             _submitStatusStream = _submitStream.Switch();
             _itemSelectionStream = new BehaviorSubject<T>(null);
+
+            _setItemStream = _submitStatusStream
+                .Where(notification => notification.Kind == NotificationKind.OnNext && notification.HasValue && notification.Value != null)
+                .Select(notification => notification.Value);
+
+            ActionStream = _setItemStream.Select(_ => RequestedAction.Complete);
 
             // State switching setup
             var setUserByNew = new ReactiveCommand();
@@ -67,10 +74,6 @@ namespace BabyBrother.ViewModels
                 .Merge(setByExistingStream)
                 .ToReactiveProperty(SetByState.New);
             AddSubscription(CurrentState);
-
-            ActionStream = _submitStatusStream
-                .Where(notification => notification.Kind == NotificationKind.OnCompleted)
-                .Select(_ => RequestedAction.Complete);
         }
 
         protected void InitializeSubmit()
@@ -91,9 +94,17 @@ namespace BabyBrother.ViewModels
             var submitCommand = new ReactiveCommand(canSubmitStream);
             AddSubscription(submitCommand.Subscribe(_ => 
             {
-                _submitStream.OnNext(OnSubmit()
-                    .Materialize()
-                    .Catch(Observable.Empty<Notification<Unit>>()));
+                if (CurrentState.Value == SetByState.New)
+                {
+                    _submitStream.OnNext(OnSubmit()
+                        .Materialize()
+                        .Catch(Observable.Empty<Notification<T>>()));
+                }
+                else
+                {
+                    _submitStream.OnNext(_itemSelectionStream
+                        .Materialize());
+                }
             }));
             SubmitCommand = submitCommand;
 
@@ -129,7 +140,7 @@ namespace BabyBrother.ViewModels
             _itemSelectionStream.OnNext(item);
         }
 
-        protected abstract IObservable<Unit> OnSubmit();
+        protected abstract IObservable<T> OnSubmit();
 
         protected abstract void OnSubmitError();
 

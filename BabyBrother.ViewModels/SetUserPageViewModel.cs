@@ -14,20 +14,27 @@ namespace BabyBrother.ViewModels
 {
     public class SetUserPageViewModel : SetItemViewModel<User>
     {
+        private readonly AppState _appState;
         private readonly IBackendService _backendService;
         private readonly INotificationService _notificationService;
         private readonly IResourceService _resourceService;
 
         public ReactiveProperty<string> NewUsername { get; private set; }
 
-        public SetUserPageViewModel(IBackendService backendService, INotificationService notificationService, IResourceService resourceService)
+        public SetUserPageViewModel(AppState appState, IBackendService backendService, INotificationService notificationService, IResourceService resourceService)
         {
+            _appState = appState;
             _backendService = backendService;
             _notificationService = notificationService;
             _resourceService = resourceService;
             
             NewUsername = new ReactiveProperty<string>();
             AddSubscription(NewUsername);
+
+            AddSubscription(_setItemStream.Subscribe(user =>
+            {
+                _appState.SetCurrentUser(user);
+            }));
 
             InitializeExistingItems(_backendService.GetUsers());
             InitializeSubmit();
@@ -42,7 +49,7 @@ namespace BabyBrother.ViewModels
             return canSubmitStream;
         }
 
-        protected override IObservable<Unit> OnSubmit()
+        protected override IObservable<User> OnSubmit()
         {
             var newName = NewUsername.Value;
             if (!string.IsNullOrWhiteSpace(newName) && CurrentState.Value == SetByState.New)
@@ -55,7 +62,7 @@ namespace BabyBrother.ViewModels
             }
             else
             {
-                return Observable.Empty<Unit>();
+                return Observable.Empty<User>();
             }
         }
 
