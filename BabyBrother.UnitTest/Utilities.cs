@@ -4,12 +4,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BabyBrother.UnitTest
 {
     internal static class Utilities
     {
+        private static readonly TimeSpan DefaulTimeout = TimeSpan.FromSeconds(5);
+
         public static Task AssertEqualsAsync<T>(T expected, Func<T> actual, TimeSpan? timeout = null)
         {
             T lastValue = default(T);
@@ -59,7 +62,7 @@ namespace BabyBrother.UnitTest
         {
             if (timeout == null)
             {
-                timeout = TimeSpan.FromSeconds(5);
+                timeout = DefaulTimeout;
             }
 
             var stopwatch = Stopwatch.StartNew();
@@ -129,19 +132,46 @@ namespace BabyBrother.UnitTest
 
             trigger();
 
-            var isOk = await tcs.Task;
-            string sequence = "";
-            foreach (var v in originalValues)
+            using (var cts = new CancellationTokenSource())
             {
-                if (sequence.Length > 0)
+                try
                 {
-                    sequence += ", ";
-                }
-                sequence += (v != null ? v.ToString() : "null");
-            }
-            sequence = "[" + sequence + "]";
+                    var timeoutTask = Task.Delay(DefaulTimeout, cts.Token);
+                    var task = tcs.Task;
 
-            Assert.IsTrue(isOk, "Failed on item " + (originalValues.Count - expectedQueue.Count) + " when verifying sequence " + sequence + ". Got " + mismatchReason);
+                    bool isOk = false;
+                    var isTimeout = await Task.WhenAny(task, timeoutTask) == timeoutTask;
+                    if (!isTimeout)
+                    {
+                        isOk = task.Result;
+                    }
+
+                    string sequence = "";
+                    foreach (var v in originalValues)
+                    {
+                        if (sequence.Length > 0)
+                        {
+                            sequence += ", ";
+                        }
+                        sequence += (v != null ? v.ToString() : "null");
+                    }
+                    sequence = "[" + sequence + "]";
+
+                    Assert.IsTrue(isOk,
+                        (isTimeout ? "Test timeout! " : "") +
+                        "Failed on item " +
+                        (originalValues.Count - expectedQueue.Count) +
+                        " when verifying sequence " +
+                        sequence +
+                        ". Got " +
+                        mismatchReason);
+                }
+                finally
+                {
+                    cts.Cancel();
+                    tcs.TrySetCanceled();
+                }
+            }
         }
     }
 }

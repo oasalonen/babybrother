@@ -179,6 +179,22 @@ namespace BabyBrother.UnitTest
             await Utilities.AssertIsApproximateTimeAsync(DateTimeOffset.Now, () => _viewModel.StopTime.Value);
         }
 
+        [TestMethod]
+        public async Task TestIsInProgressIsTrueAfterStart()
+        {
+            await _viewModel.IsRunning.AssertNextValueIs(new List<bool>() { false, true }, () => _viewModel.Start.Execute(null));
+        }
+
+        [TestMethod]
+        public async Task TestIsInProgressIsFalseAfterStop()
+        {
+            await _viewModel.IsRunning.AssertNextValueIs(new List<bool>() { false, true, false }, () =>
+            {
+                _viewModel.Start.Execute(null);
+                _viewModel.Stop.Execute(null);
+            });
+        }
+
         public bool IsSourceSelectionsValid(FeedPageViewModel viewModel, Feeding.Source source)
         {
             switch (source)

@@ -18,6 +18,8 @@ namespace BabyBrother.ViewModels
 
         public ReactiveProperty<DateTimeOffset> StopTime { get; private set; }
 
+        public ReactiveProperty<bool> IsRunning { get; private set; }
+
         public ReactiveProperty<bool> IsLeftBreastSelected { get; private set; }
 
         public ReactiveProperty<bool> IsRightBreastSelected { get; private set; }
@@ -43,12 +45,17 @@ namespace BabyBrother.ViewModels
             var start = new ReactiveCommand(isStartTimeSetStream.Select(isSet => !isSet));
             Start = start;
             AddSubscription(start);
+            AddSubscription(start.Subscribe(_ => StartTime.Value = DateTimeOffset.Now));
 
             var isStopTimeSetStream = StopTime.Select(time => IsValidDateTime(time));
             var canStopStream = isStartTimeSetStream.CombineLatest(isStopTimeSetStream, (isStartTimeSet, isStopTimeSet) => isStartTimeSet && !isStopTimeSet);
             var stop = new ReactiveCommand(canStopStream);
             Stop = stop;
             AddSubscription(stop);
+            AddSubscription(stop.Subscribe(_ => StopTime.Value = DateTimeOffset.Now));
+
+            IsRunning = canStopStream.ToReactiveProperty();
+            AddSubscription(IsRunning);
 
             IsLeftBreastSelected = new ReactiveProperty<bool>(false);
             IsRightBreastSelected = new ReactiveProperty<bool>(false);
