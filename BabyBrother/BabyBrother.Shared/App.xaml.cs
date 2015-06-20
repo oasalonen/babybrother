@@ -109,7 +109,7 @@ namespace BabyBrother
                 // configuring the new page by passing required information as a navigation
                 // parameter
 #if !WINDOWS_PHONE_APP
-                if (!rootFrame.Navigate(typeof(MainPage), e.Arguments))
+                if (!rootFrame.Navigate(typeof(SetUserPage), e.Arguments))
                 {
                     throw new Exception("Failed to create initial page");
                 }

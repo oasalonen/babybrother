@@ -6,11 +6,8 @@ using System.Text;
 
 namespace BabyBrother.Models
 {
-    public class User
+    public class User : IdModel
     {
-        [JsonProperty(PropertyName="id")]
-        public string Id { get; set; }
-
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
     }

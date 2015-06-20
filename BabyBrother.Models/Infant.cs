@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BabyBrother.Models
 {
-    public class Infant
+    public class Infant : IdModel
     {
         public enum GenderType
         {
@@ -15,9 +15,6 @@ namespace BabyBrother.Models
             Female,
             Other
         }
-
-        [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
 
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }

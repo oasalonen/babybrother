@@ -142,7 +142,7 @@ namespace BabyBrother.UnitTest
             var type = typeof(T);
             var tcs = new TaskCompletionSource<bool>();
 
-            source.Subscribe(
+            var subscription = source.Subscribe(
                 (v) =>
                 {
                     if (!tcs.Task.IsCompleted)
@@ -175,46 +175,92 @@ namespace BabyBrother.UnitTest
                     }
                 });
 
-            trigger();
-
-            using (var cts = new CancellationTokenSource())
+            using (subscription)
             {
-                try
+                trigger();
+
+                using (var cts = new CancellationTokenSource())
                 {
-                    var timeoutTask = Task.Delay(DefaulTimeout, cts.Token);
-                    var task = tcs.Task;
-
-                    bool isOk = false;
-                    var isTimeout = await Task.WhenAny(task, timeoutTask) == timeoutTask;
-                    if (!isTimeout)
+                    try
                     {
-                        isOk = task.Result;
-                    }
+                        var timeoutTask = Task.Delay(DefaulTimeout, cts.Token);
+                        var task = tcs.Task;
 
-                    string sequence = "";
-                    foreach (var v in originalValues)
-                    {
-                        if (sequence.Length > 0)
+                        bool isOk = false;
+                        var isTimeout = await Task.WhenAny(task, timeoutTask) == timeoutTask;
+                        if (!isTimeout)
                         {
-                            sequence += ", ";
+                            isOk = task.Result;
                         }
-                        sequence += (v != null ? v.ToString() : "null");
-                    }
-                    sequence = "[" + sequence + "]";
 
-                    Assert.IsTrue(isOk,
-                        (isTimeout ? "Test timeout! " : "") +
-                        "Failed on item " +
-                        (originalValues.Count - expectedQueue.Count) +
-                        " when verifying sequence " +
-                        sequence +
-                        ". Got " +
-                        mismatchReason);
+                        string sequence = "";
+                        foreach (var v in originalValues)
+                        {
+                            if (sequence.Length > 0)
+                            {
+                                sequence += ", ";
+                            }
+                            sequence += (v != null ? v.ToString() : "null");
+                        }
+                        sequence = "[" + sequence + "]";
+
+                        Assert.IsTrue(isOk,
+                            (isTimeout ? "Test timeout! " : "") +
+                            "Failed on item " +
+                            (originalValues.Count - expectedQueue.Count) +
+                            " when verifying sequence " +
+                            sequence +
+                            ". Got " +
+                            mismatchReason);
+                    }
+                    finally
+                    {
+                        cts.Cancel();
+                        tcs.TrySetCanceled();
+                    }
                 }
-                finally
+            }
+        }
+
+        public static async Task AssertEmitsNone<T>(this IObservable<T> source, Action trigger = null, TimeSpan? timeout = null)
+        {
+            if (timeout == null)
+            {
+                timeout = TimeSpan.FromMilliseconds(50);
+            }
+
+            var tcs = new TaskCompletionSource<bool>();
+
+            var subscription = source.Subscribe(
+                (_) => tcs.TrySetResult(false),
+                (e) => tcs.TrySetResult(true),
+                () => tcs.TrySetResult(true));
+
+            using (subscription)
+            {
+                if (trigger != null)
                 {
-                    cts.Cancel();
-                    tcs.TrySetCanceled();
+                    trigger();
+                }
+
+                using (var cts = new CancellationTokenSource(timeout.Value))
+                {
+                    try
+                    {
+                        var task = tcs.Task;
+                        if (await Task.WhenAny(Task.Delay(TimeSpan.FromMilliseconds(50)), task) == task)
+                        {
+                            Assert.IsTrue(task.Result);
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                    finally
+                    {
+                        tcs.TrySetCanceled();
+                    }
                 }
             }
         }
