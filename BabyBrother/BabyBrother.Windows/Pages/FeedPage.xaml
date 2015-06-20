@@ -3,12 +3,23 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:BabyBrother"
+    xmlns:converters="using:BabyBrother.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
     <Grid x:Name="RootGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.Resources>
+            <converters:VisibilityConverter 
+                x:Key="VisibilityConverter" 
+                />
+            <converters:VisibilityConverter 
+                x:Key="InvertedVisibilityConverter" 
+                IsInverted="True" 
+                />
+            <converters:TimeStringConverter
+                x:Key="TimeStringConverter"
+                />
         </Grid.Resources>
 
         <Grid 
@@ -63,7 +74,8 @@
             </StackPanel>
             
             <StackPanel
-                Grid.Row="2">
+                Grid.Row="2"
+                Visibility="{Binding IsRunning.Value, Converter={StaticResource InvertedVisibilityConverter}}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -98,21 +110,21 @@
                         Grid.Row="0"
                         Grid.Column="1"
                         Style="{StaticResource SubheaderTextStyle}"
-                        Text="00:00 am"
+                        Text="{Binding StartTime.Value, Converter={StaticResource TimeStringConverter}}"
                         Margin="20,0,0,0"
                         />
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="1"
                         Style="{StaticResource SubheaderTextStyle}"
-                        Text="00:00 am"
+                        Text="{Binding StopTime.Value, Converter={StaticResource TimeStringConverter}}"
                         Margin="20,0,0,0"
                         />
                     <TextBlock
                         Grid.Row="2"
                         Grid.Column="1"
                         Style="{StaticResource SubheaderTextStyle}"
-                        Text="00:00:00"
+                        Text="{Binding Duration.Value, Converter={StaticResource TimeStringConverter}}"
                         Margin="20,0,0,0"
                         />
                 </Grid>
@@ -121,7 +133,8 @@
             <Grid 
                 Grid.Row="3"
                 VerticalAlignment="Center"
-                HorizontalAlignment="Center">
+                HorizontalAlignment="Center"
+                Visibility="{Binding IsRunning.Value, Converter={StaticResource VisibilityConverter}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -137,16 +150,24 @@
                     Grid.Row="1"
                     HorizontalAlignment="Center"
                     Style="{StaticResource SubheaderTextStyle}"
-                    Text="00:00:00"
+                    Text="{Binding Duration.Value, Converter={StaticResource TimeStringConverter}}"
                     />
             </Grid>
 
-            <Button
+            <StackPanel
                 Grid.Row="4"
-                VerticalAlignment="Bottom"
-                HorizontalAlignment="Stretch"
-                Content="Stop"
-                />
+                VerticalAlignment="Bottom">
+                <Button
+                    HorizontalAlignment="Stretch"
+                    Content="Start"
+                    Command="{Binding Start}"
+                    />
+                <Button
+                    HorizontalAlignment="Stretch"
+                    Content="Stop"
+                    Command="{Binding Stop}"
+                    />
+            </StackPanel>
         </Grid>
     </Grid>
 </Page>

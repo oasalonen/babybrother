@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BabyBrother.Base;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Windows.UI.Xaml;
@@ -15,7 +16,9 @@ namespace BabyBrother.Converters
             Boolean booleanValue =
                 (value is Boolean ?
                 (Boolean)value :    // type is bool, use it
-                (value != null));   // type is something else, use null check
+                (value is DateTimeOffset ?
+                TimeUtilities.IsValid((DateTimeOffset)value) :
+                (value != null)));   // type is something else, use null check
 
             if (IsInverted)
             {

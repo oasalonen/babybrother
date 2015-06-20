@@ -1,4 +1,5 @@
-﻿using BabyBrother.Models;
+﻿using BabyBrother.Base;
+using BabyBrother.Models;
 using Reactive.Bindings;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,8 @@ namespace BabyBrother.ViewModels
         public ReactiveProperty<DateTimeOffset> StartTime { get; private set; }
 
         public ReactiveProperty<DateTimeOffset> StopTime { get; private set; }
+
+        public ReactiveProperty<TimeSpan> Duration { get; private set; }
 
         public ReactiveProperty<bool> IsRunning { get; private set; }
 
@@ -41,13 +44,13 @@ namespace BabyBrother.ViewModels
             StartTime = new ReactiveProperty<DateTimeOffset>(DateTimeOffset.MinValue);
             StopTime = new ReactiveProperty<DateTimeOffset>(DateTimeOffset.MinValue);
 
-            var isStartTimeSetStream = StartTime.Select(time => IsValidDateTime(time));
+            var isStartTimeSetStream = StartTime.Select(time => TimeUtilities.IsValid(time));
             var start = new ReactiveCommand(isStartTimeSetStream.Select(isSet => !isSet));
             Start = start;
             AddSubscription(start);
             AddSubscription(start.Subscribe(_ => StartTime.Value = DateTimeOffset.Now));
 
-            var isStopTimeSetStream = StopTime.Select(time => IsValidDateTime(time));
+            var isStopTimeSetStream = StopTime.Select(time => TimeUtilities.IsValid(time));
             var canStopStream = isStartTimeSetStream.CombineLatest(isStopTimeSetStream, (isStartTimeSet, isStopTimeSet) => isStartTimeSet && !isStopTimeSet);
             var stop = new ReactiveCommand(canStopStream);
             Stop = stop;
@@ -56,6 +59,20 @@ namespace BabyBrother.ViewModels
 
             IsRunning = canStopStream.ToReactiveProperty();
             AddSubscription(IsRunning);
+
+            var heartbeat = Observable
+                .Interval(TimeSpan.FromMilliseconds(500))
+                .Select(_ => DateTimeOffset.Now);
+
+            var validStartTimeStream = StartTime.Where(time => TimeUtilities.IsValid(time));
+
+            Duration = IsRunning
+                .Select(isRunning => isRunning ? heartbeat : StopTime)
+                .Switch()
+                .Where(time => TimeUtilities.IsValid(time))
+                .CombineLatest(validStartTimeStream, (stopTime, startTime) => stopTime - startTime)
+                .ToReactiveProperty();
+            AddSubscription(Duration);
 
             IsLeftBreastSelected = new ReactiveProperty<bool>(false);
             IsRightBreastSelected = new ReactiveProperty<bool>(false);
@@ -124,11 +141,6 @@ namespace BabyBrother.ViewModels
                     IsLeftBreastSelected.Value = false;
                 }
             }));
-        }
-
-        private static bool IsValidDateTime(DateTimeOffset? time)
-        {
-            return !(time == null || time.Value == DateTimeOffset.MinValue || time.Value == new DateTimeOffset());
         }
     }
 }

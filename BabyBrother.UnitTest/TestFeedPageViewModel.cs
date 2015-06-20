@@ -195,6 +195,23 @@ namespace BabyBrother.UnitTest
             });
         }
 
+        [TestMethod]
+        public async Task TestDurationIsSetUntilNowIfStartTimeIsSet()
+        {
+            var expectedDuration = TimeSpan.FromHours(1);
+            _viewModel.StartTime.Value = DateTimeOffset.Now - expectedDuration;
+            await Utilities.AssertIsApproximateTimeAsync(expectedDuration, () => _viewModel.Duration.Value);
+        }
+
+        [TestMethod]
+        public async Task TestDurationIsSetUntilStopTimeIfStartAndStopTimeIsSet()
+        {
+            var expectedDuration = TimeSpan.FromHours(1);
+            _viewModel.StartTime.Value = DateTimeOffset.Now;
+            _viewModel.StopTime.Value = DateTimeOffset.Now + expectedDuration;
+            await Utilities.AssertIsApproximateTimeAsync(expectedDuration, () => _viewModel.Duration.Value);
+        }
+
         public bool IsSourceSelectionsValid(FeedPageViewModel viewModel, Feeding.Source source)
         {
             switch (source)

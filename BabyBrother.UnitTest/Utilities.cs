@@ -43,7 +43,7 @@ namespace BabyBrother.UnitTest
                 {
                     diff = diff.Negate();
                 }
-                return diff.CompareTo(delta.Value) <= 1;
+                return diff.CompareTo(delta.Value) < 1;
             };
 
             return AssertAsync(() =>
@@ -55,6 +55,51 @@ namespace BabyBrother.UnitTest
             {
                 var message = "DateTime equality mismatch. Expected time: " + expected.ToString() + ", Actual time: " + lastValue.ToString() + ", Max delta: " + delta.Value.ToString();
                 Assert.IsTrue(isApproximatelyEqual(lastValue, expected), message);
+            }, timeout);
+        }
+
+        public static Task AssertIsApproximateTimeAsync(TimeSpan expected, Func<TimeSpan> actual, TimeSpan? delta = null, TimeSpan? timeout = null)
+        {
+            if (delta == null)
+            {
+                delta = TimeSpan.FromSeconds(10);
+            }
+            var lastValue = TimeSpan.MinValue;
+
+            Func<TimeSpan, TimeSpan, bool> isApproximatelyEqual = (t1, t2) =>
+            {
+                var diff = t1 - t2;
+                if (diff.Ticks < 0)
+                {
+                    diff = diff.Negate();
+                }
+                return diff.CompareTo(delta.Value) < 1;
+            };
+
+            return AssertAsync(() =>
+            {
+                lastValue = actual();
+                return isApproximatelyEqual(lastValue, expected);
+            },
+            () =>
+            {
+                var message = "TimeSpan equality mismatch. Expected time: " + expected.ToString() + ", Actual time: " + lastValue.ToString() + ", Max delta: " + delta.Value.ToString();
+                Assert.IsTrue(isApproximatelyEqual(lastValue, expected), message);
+            }, timeout);
+        }
+
+        public static Task AssertIsLessThanTimeAsync(TimeSpan lessThanTimeSpan, Func<TimeSpan> actual, TimeSpan? timeout = null)
+        {
+            var lastValue = TimeSpan.MaxValue;
+            return AssertAsync(() =>
+            {
+                lastValue = actual();
+                return lessThanTimeSpan.CompareTo(lastValue) < 0;
+            },
+            () =>
+            {
+                var message = "Actual timespan more than expected. Expected less than: " + lessThanTimeSpan.ToString() + ", Got: " + lastValue.ToString();
+                Assert.IsTrue(lessThanTimeSpan.CompareTo(lastValue) < 0, message);
             }, timeout);
         }
 
